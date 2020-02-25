@@ -7,7 +7,7 @@
               pluginIsSynth="0" pluginWantsMidiIn="0" pluginProducesMidiOut="0"
               pluginSilenceInIsSilenceOut="0" pluginEditorRequiresKeys="0"
               pluginAUExportPrefix="HOSIRRAU" pluginRTASCategory="" aaxIdentifier="com.yourcompany.hosirr"
-              pluginAAXCategory="2" jucerVersion="5.4.3" buildVST3="0" buildRTAS="0"
+              pluginAAXCategory="2" jucerVersion="5.4.4" buildVST3="0" buildRTAS="0"
               buildAAX="0" pluginManufacturerEmail="support@yourcompany.com"
               companyName="Aalto" companyEmail="leo.t.mccormack@gmail.com"
               userNotes="_CRT_SECURE_NO_WARNINGS&#10;_WINSOCK_DEPRECATED_NO_WARNINGS&#10;"
@@ -220,13 +220,12 @@
                extraDefs="SAF_USE_INTEL_MKL&#10;">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="HOSIRRd"
-                       binaryPath="" headerPath="../../../../SDKs/Spatial_Audio_Framework/framework/include&#10;../../../../hosirrlib/include&#10;../../../../SDKs/Spatial_Audio_Framework/dependencies/MacOSX/include&#10;../../../../SDKs/VST2_SDK&#10;/opt/intel/compilers_and_libraries/mac/mkl/include"
-                       osxArchitecture="64BitIntel" osxCompatibility="10.10 SDK" libraryPath="../../../../SDKs/Spatial_Audio_Framework/dependencies/MacOSX/lib"
-                       enablePluginBinaryCopyStep="1"/>
+                       binaryPath="" headerPath="../../../../SDKs/Spatial_Audio_Framework/framework/include&#10;../../../../hosirrlib/include&#10;../../../../SDKs/VST2_SDK&#10;/opt/intel/compilers_and_libraries/mac/mkl/include"
+                       osxArchitecture="64BitIntel" osxCompatibility="10.10 SDK" enablePluginBinaryCopyStep="1"/>
         <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="HOSIRR"
-                       binaryPath="" headerPath="../../../../SDKs/Spatial_Audio_Framework/framework/include&#10;../../../../hosirrlib/include&#10;../../../../SDKs/Spatial_Audio_Framework/dependencies/MacOSX/include&#10;../../../../SDKs/VST2_SDK&#10;/opt/intel/compilers_and_libraries/mac/mkl/include"
-                       osxArchitecture="64BitIntel" osxCompatibility="10.10 SDK" libraryPath="../../../../../SDKs/Spatial_Audio_Framework/dependencies/MacOSX/lib"
-                       enablePluginBinaryCopyStep="1" linkTimeOptimisation="1"/>
+                       binaryPath="" headerPath="../../../../SDKs/Spatial_Audio_Framework/framework/include&#10;../../../../hosirrlib/include&#10;../../../../SDKs/VST2_SDK&#10;/opt/intel/compilers_and_libraries/mac/mkl/include"
+                       osxArchitecture="64BitIntel" osxCompatibility="10.10 SDK" enablePluginBinaryCopyStep="1"
+                       linkTimeOptimisation="1"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_opengl" path="../SDKs/modules"/>
