@@ -7,7 +7,7 @@
               pluginIsSynth="0" pluginWantsMidiIn="0" pluginProducesMidiOut="0"
               pluginSilenceInIsSilenceOut="0" pluginEditorRequiresKeys="0"
               pluginAUExportPrefix="HOSIRRAU" pluginRTASCategory="" aaxIdentifier="com.yourcompany.hosirr"
-              pluginAAXCategory="2" jucerVersion="5.4.4" buildVST3="0" buildRTAS="0"
+              pluginAAXCategory="2" jucerVersion="5.4.7" buildVST3="0" buildRTAS="0"
               buildAAX="0" pluginManufacturerEmail="support@yourcompany.com"
               companyName="Aalto" companyEmail="leo.t.mccormack@gmail.com"
               userNotes="_CRT_SECURE_NO_WARNINGS&#10;_WINSOCK_DEPRECATED_NO_WARNINGS&#10;"
@@ -104,6 +104,8 @@
                   file="../SDKs/Spatial_Audio_Framework/framework/modules/saf_utilities/saf_matrixConv.c"/>
             <FILE id="nOKfXQ" name="saf_matrixConv.h" compile="0" resource="0"
                   file="../SDKs/Spatial_Audio_Framework/framework/modules/saf_utilities/saf_matrixConv.h"/>
+            <FILE id="L5W8Ds" name="saf_misc.c" compile="1" resource="0" file="../SDKs/Spatial_Audio_Framework/framework/modules/saf_utilities/saf_misc.c"/>
+            <FILE id="zGH7Mf" name="saf_misc.h" compile="0" resource="0" file="../SDKs/Spatial_Audio_Framework/framework/modules/saf_utilities/saf_misc.h"/>
             <FILE id="jUEp0b" name="saf_sensorarray_presets.c" compile="1" resource="0"
                   file="../SDKs/Spatial_Audio_Framework/framework/modules/saf_utilities/saf_sensorarray_presets.c"/>
             <FILE id="qDJJH6" name="saf_sensorarray_presets.h" compile="0" resource="0"

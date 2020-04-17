@@ -20,31 +20,33 @@
  ==============================================================================
  */
 
-/*
- * Filename: hosirrlib.c
- * ---------------------
- * hosirrlib is a C-port of the Higher-order Spatial Impulse Response Rendering
- * (HO-SIRR) Matlab toolbox: https://github.com/leomccormack/HO-SIRR
+/**
+ * @file hosirrlib.c
+ * @brief A C-port of the Higher-order Spatial Impulse Response Rendering
+ *        (HO-SIRR) Matlab toolbox: https://github.com/leomccormack/HO-SIRR
+ *
  * HO-SIRR is a rendering method, which can synthesise output loudspeaker array
  * room impulse responses (RIRs) using input spherical harmonic (Ambisonic/
  * B-Format) RIRs of arbitrary order. The method makes assumptions regarding
  * the composition of the sound-field and extracts spatial parameters over time,
  * which allows it to map the input to the output in an adaptive and informed
  * manner.
+ *
  * The idea is that you then convolve a monophonic source with this loudspeaker
  * array RIR, and it will be reproduced and exhibit the spatial characteristics
  * of the captured space more faithfully (when compared to linear methods such
  * as Ambisonics).
  *
- * Dependencies:
- *     Spatial_Audio_Framework
- * Author, date created:
- *     Leo McCormack, 04.01.2020
+ * Dependencies: Spatial_Audio_Framework
+ * (https://github.com/leomccormack/Spatial_Audio_Framework)
  *
- * [1] McCormack, L., Politis, A., Scheuregger, O., and Pulkki, V. (2019).
- *     "Higher-order processing of spatial impulse responses". In Proceedings of
- *     the 23rd International Congress on Acoustics, 9--13 September 2019 in
- *     Aachen, Germany.
+ * @see [1] McCormack, L., Politis, A., Scheuregger, O., and Pulkki, V. (2019).
+ *          "Higher-order processing of spatial impulse responses". In
+ *          Proceedings of the 23rd International Congress on Acoustics, 9--13
+ *          September 2019 in Aachen, Germany.
+ *
+ * @author Leo McCormack
+ * @date 04.01.2020
  */
 
 #include "hosirr_internal.h"

@@ -20,31 +20,33 @@
  ==============================================================================
  */
 
-/*
- * Filename: hosirr_internal.h
- * ---------------------------
- * hosirrlib is a C-port of the Higher-order Spatial Impulse Response Rendering
- * (HO-SIRR) Matlab toolbox: https://github.com/leomccormack/HO-SIRR
+/**
+ * @file hosirr_internal.h
+ * @brief A C-port of the Higher-order Spatial Impulse Response Rendering
+ *        (HO-SIRR) Matlab toolbox: https://github.com/leomccormack/HO-SIRR
+ *
  * HO-SIRR is a rendering method, which can synthesise output loudspeaker array
  * room impulse responses (RIRs) using input spherical harmonic (Ambisonic/
  * B-Format) RIRs of arbitrary order. The method makes assumptions regarding
  * the composition of the sound-field and extracts spatial parameters over time,
  * which allows it to map the input to the output in an adaptive and informed
  * manner.
+ *
  * The idea is that you then convolve a monophonic source with this loudspeaker
  * array RIR, and it will be reproduced and exhibit the spatial characteristics
  * of the captured space more faithfully (when compared to linear methods such
  * as Ambisonics).
  *
- * Dependencies:
- *     Spatial_Audio_Framework
- * Author, date created:
- *     Leo McCormack, 04.01.2020
+ * Dependencies: Spatial_Audio_Framework
+ * (https://github.com/leomccormack/Spatial_Audio_Framework)
  *
- * [1] McCormack, L., Politis, A., Scheuregger, O., and Pulkki, V. (2019).
- *     "Higher-order processing of spatial impulse responses". In Proceedings of
- *     the 23rd International Congress on Acoustics, 9--13 September 2019 in
- *     Aachen, Germany.
+ * @see [1] McCormack, L., Politis, A., Scheuregger, O., and Pulkki, V. (2019).
+ *          "Higher-order processing of spatial impulse responses". In
+ *          Proceedings of the 23rd International Congress on Acoustics, 9--13
+ *          September 2019 in Aachen, Germany.
+ *
+ * @author Leo McCormack
+ * @date 04.01.2020
  */
 
 #ifndef __HOSIRR_INTERNAL_H_INCLUDED__
@@ -80,10 +82,8 @@ extern "C" {
 /*                                 Structures                                 */
 /* ========================================================================== */
 
-/*
- * Struct: hosirrlib
- * -----------------
- * Main structure for hosirrlib. Contains variables for ....
+/**
+ * Main structure for hosirrlib
  */
 typedef struct _hosirrlib
 {
@@ -109,8 +109,7 @@ typedef struct _hosirrlib
     float loudpkrs_dirs_deg[MAX_NUM_LOUDSPEAKERS][2];
     CH_ORDER chOrdering;   /* only ACN is supported */
     NORM_TYPES norm;       /* N3D or SN3D */
-    
-    
+
 } hosirrlib_data;
 
 
@@ -118,27 +117,15 @@ typedef struct _hosirrlib
 /*                             Internal Functions                             */
 /* ========================================================================== */
 
-/*
- * Function: loadLoudspeakerArrayPreset
- * ------------------------------------
- * Returns the loudspeaker directions for a specified loudspeaker array preset.
- * The function also returns the number of loudspeakers in the array, and a
- * crude estimate of whether it is 2D or 3D (based on whether the sum of the
- * absolute loudspeaker elevation angle is not zero).
- * Note: 2-D setups which are not on the horizontal plane (i.e.
- * all elevations==0) will be registered as a 3-D setup.
- * Further Note: default uniformly distributed points are used to pad the
- * dirs_deg matrix up to the MAX_NUM_LOUDSPEAKERS_IN_PRESET, if nCH is less than
- * this. This can help avoid scenarios of many sources being panned in the same
- * direction, or triangulations errors.
+/**
+ * Returns the loudspeaker directions for a specified loudspeaker array preset
+ * (see LOUDSPEAKER_ARRAY_PRESETS enum)
  *
- * Input Arguments:
- *     preset   - see "LOUDSPEAKER_ARRAY_PRESETS" enum
- * Output Arguments:
- *     dirs_deg - loudspeaker directions, [azimuth elevation] convention, in
- *                DEGREES;
- *     nCH      - & number of loudspeaker directions in the array
- *     nDims    - & number of dimensions (2 or 3)
+ * @param[in]  preset   see LOUDSPEAKER_ARRAY_PRESETS enum
+ * @param[out] dirs_deg loudspeaker directions, [azimuth elevation] convention,
+ *                      in DEGREES
+ * @param[out] nCH      (&) number of loudspeaker directions in the array
+ * @param[out] nDims    (&) number of dimensions (2 or 3)
  */
 void loadLoudspeakerArrayPreset(LOUDSPEAKER_ARRAY_PRESETS preset,
                                 float dirs_deg[MAX_NUM_LOUDSPEAKERS_IN_PRESET][2],
