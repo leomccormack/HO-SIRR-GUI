@@ -116,7 +116,7 @@ void hosirrlib_render
     int idx, jl, lSig, lSig_pad;
     float fs, wetDry, peakNorm, normSec, nearestVal, tmp, a2eNorm;
     float intensity[3], diff_intensity[3], energy, diff_energy, normSecIntensity;
-    float t60[6] = {0.2f, 0.2f, 0.16f, 0.12f, 0.09f, 0.04f};
+    float t60[6] = {0.07f, 0.07f, 0.06f, 0.04f, 0.02f, 0.01f}; 
     float fc[6] = {125.0f, 250.0f, 500.0f, 1000.0f, 2000.0f, 4000.0f};
     float IntensityBB[3] = {0.0f};
     float IntensityBB_XYZ[3];
