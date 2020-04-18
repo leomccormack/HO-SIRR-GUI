@@ -324,7 +324,7 @@ PluginEditor::PluginEditor (PluginProcessor* ownerFilter)
     currentView = RIR_VIEW_SH_LABELS;
     thumbnailComp->setLabelsView(currentView);
     CBdisplayRIR->addItem (TRANS("Ambi RIR"), RIR_VIEW_SH_LABELS);
-    CBdisplayRIR->addItem (TRANS("LS RIR"), RIR_VIEW_LS_LABELS);
+    ///CBdisplayRIR->addItem (TRANS("LS RIR"), RIR_VIEW_LS_LABELS);
 
     /* grab current parameter settings */
     CBanaOrder->setSelectedId(hosirrlib_getAnalysisOrder(hHS), dontSendNotification);
