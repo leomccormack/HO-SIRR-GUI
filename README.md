@@ -70,7 +70,7 @@ bash build-plugin.sh all
 build-plugin.bat <path/to/Projucer.exe>
 ```
 
-## Authors
+## Developers
 
 * **Leo McCormack** - C/C++ programmer and algorithm design (contact: leo.mccormack(at)aalto.fi)
 * **Archontis Politis** - algorithm design
