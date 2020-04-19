@@ -1,8 +1,8 @@
 # HO-SIRR-GUI
 
-Higher-order Spatial Impulse Response Rendering (HO-SIRR) is a rendering method [1], which can synthesise output loudspeaker array room impulse responses (RIRs) using input spherical harmonic (Ambisonic/B-Format) RIRs of arbitrary order. The method makes assumptions regarding the composition of the sound-field and extracts spatial parameters over time, which allows it to map the input to the output in an adaptive and more informed manner; when compared to linear methods such as Ambisonics.
+A VST and standalone App implementation of the Higher-order Spatial Impulse Response Rendering (HO-SIRR) method [1]. Developed using [JUCE](https://github.com/WeAreROLI/JUCE/) and the [Spatial_Audio_Framework](https://github.com/leomccormack/Spatial_Audio_Framework).
 
-The idea is that you then convolve a monophonic source with this loudspeaker array RIR, and it will be reproduced and exhibit all of the spatial characteristics of the captured space.
+HO-SIRR can synthesise output loudspeaker array room impulse responses (RIRs) using input spherical harmonic (Ambisonic/B-Format) RIRs of arbitrary order. The method makes assumptions regarding the composition of the sound-field and extracts spatial parameters over time, which allows it to map the input to the output in an adaptive and more informed manner; when compared to linear methods such as Ambisonics. The idea is that you then convolve a monophonic source with this loudspeaker array RIR, and it will be reproduced and exhibit all of the spatial characteristics of the captured space.
 
 ![](HOSIRR_GUI.png)
 
@@ -19,17 +19,15 @@ First clone the repository (including submodules) with:
 
 ```
 git clone --recursive https://github.com/leomccormack/HO-SIRR-GUI
-# or if you have already cloned the repository, update with:
+# or if you have already cloned the repository, update with
 git submodule update --init --recursive
-git pull --recurse-submodules
 ```
 
 ## Prerequisites 
 
-The JUCE [modules](https://github.com/WeAreROLI/JUCE/releases) and [VST2_SDK](https://web.archive.org/web/20181016150224/https://download.steinberg.net/sdk_downloads/vstsdk3610_11_06_2018_build_37.zip), must be placed in the 'SDKs' folder like so:
+The [VST2_SDK](https://web.archive.org/web/20181016150224/https://download.steinberg.net/sdk_downloads/vstsdk3610_11_06_2018_build_37.zip), must be placed in the 'SDKs' folder like so:
 
-```
-SDKs/modules 
+``` 
 SDKs/VST2_SDK
 ```
 
@@ -74,7 +72,7 @@ build-plugin.bat <path/to/Projucer.exe>
 
 ## Authors
 
-* **Leo McCormack** - C/C++ programmer and algorithm design (contact: leo.mccormack"at"aalto.fi)
+* **Leo McCormack** - C/C++ programmer and algorithm design (contact: leo.mccormack(at)aalto.fi)
 * **Archontis Politis** - algorithm design
 * **Ville Pulkki** - algorithm design
 
