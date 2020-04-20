@@ -5,4 +5,5 @@
 [submodule "SDKs/JUCE"]
 	path = SDKs/JUCE
 	url = https://github.com/juce-framework/JUCE.git
-    ignore = all
+	ignore = all
+	shallow = true
