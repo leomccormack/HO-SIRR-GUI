@@ -116,16 +116,17 @@ void hosirrlib_render
     int idx, jl, lSig, lSig_pad;
     float fs, wetDry, peakNorm, normSec, nearestVal, tmp, a2eNorm;
     float intensity[3], diff_intensity[3], energy, diff_energy, normSecIntensity;
-    float t60[6] = {0.07f, 0.07f, 0.06f, 0.04f, 0.02f, 0.01f}; 
+    //float t60[6] = {0.07f, 0.07f, 0.06f, 0.04f, 0.02f, 0.01f};
+    float t60[6] = {0.2f, 0.2f, 0.16f, 0.12f, 0.09f, 0.04};
     float fc[6] = {125.0f, 250.0f, 500.0f, 1000.0f, 2000.0f, 4000.0f};
     float IntensityBB[3] = {0.0f};
     float IntensityBB_XYZ[3];
     float* shir, *shir_tmp, *direct_win, *shir_direct, *shir_pad, *gtable, *sec_dirs_deg, *sectorCoeffs_tmp;
-    float* lsir_ndiff, *lsir_diff, *win, *Y_enc_tmp, *M_diff_tmp;
+    float* lsir_ndiff, *lsir_diff, *win, *Y_enc_tmp, *D_ls_tmp;
     float* prev_diff_energy, *prev_diff_intensity, *azim, *elev, *diffs;
     float* insig_win, *ndiffs_sqrt, *lsir_win, *M_ifft, *M_ifft_fl, *rir_filt;
-    float_complex* A_xyz, *sectorCoeffs, *sectorCoeffs_syn, *Y_enc, *M_diff;
-    float_complex* inspec_syn, *inspec_anl, *WXYZ_anl, *WXYZ_sec, *W_diff, *W_syn;
+    float_complex* A_xyz, *sectorCoeffs, *sectorCoeffs_syn, *Y_enc, *D_ls;
+    float_complex* inspec_syn, *inspec_anl, *s_anl, *WXYZ_sec, *z_diff, *z_00;
     float_complex* ndiffgains_interp, *diffgains_interp, *ndiffgains, *diffs_sqrt;
     float_complex* outspec_ndiff, *outspec_diff, *a_diff;
     float_complex pvCOV[4][4];
@@ -271,19 +272,29 @@ void hosirrlib_render
     
     /* diffuse stream rendering intialisations */
     a2eNorm = (float)nLS/(sqrtf((float)nLS));
-    Y_enc_tmp = malloc1d(nSH*numSec*sizeof(float));
-    getRSH(order, sec_dirs_deg, numSec, Y_enc_tmp);
-    M_diff_tmp = malloc1d(nLS*nSH*sizeof(float));
-    getLoudspeakerAmbiDecoderMtx((float*)pData->loudpkrs_dirs_deg, nLS, LOUDSPEAKER_DECODER_SAD, order, 0, M_diff_tmp);
-    utility_svsmul(M_diff_tmp, &a2eNorm, nLS*nSH, M_diff_tmp);
-    Y_enc = malloc1d(nSH*numSec*sizeof(float_complex));
-    M_diff = malloc1d(nLS*nSH*sizeof(float_complex));
-    for(i=0; i<nSH*numSec; i++)
-        Y_enc[i] = cmplxf(Y_enc_tmp[i], 0.0f);
-    for(i=0; i<nLS*nSH; i++)
-        M_diff[i] = cmplxf(M_diff_tmp[i], 0.0f);
-    free(Y_enc_tmp);
-    free(M_diff_tmp);
+    if(order==1){
+        D_ls_tmp = malloc1d(nLS*nSH*sizeof(float));
+        getLoudspeakerAmbiDecoderMtx((float*)pData->loudpkrs_dirs_deg, nLS, LOUDSPEAKER_DECODER_SAD, order, 0, D_ls_tmp);
+        utility_svsmul(D_ls_tmp, &a2eNorm, nLS*nSH, D_ls_tmp);
+        D_ls = malloc1d(nLS*nSH*sizeof(float_complex));
+        for(i=0; i<nLS*nSH; i++)
+            D_ls[i] = cmplxf(D_ls_tmp[i], 0.0f);
+    }
+    else{
+        Y_enc_tmp = malloc1d(nSH_sec*numSec*sizeof(float));
+        getRSH(order_sec, sec_dirs_deg, numSec, Y_enc_tmp);
+        D_ls_tmp = malloc1d(nLS*nSH_sec*sizeof(float));
+        getLoudspeakerAmbiDecoderMtx((float*)pData->loudpkrs_dirs_deg, nLS, LOUDSPEAKER_DECODER_SAD, order_sec, 0, D_ls_tmp);
+        utility_svsmul(D_ls_tmp, &a2eNorm, nLS*nSH_sec, D_ls_tmp);
+        Y_enc = malloc1d(nSH_sec*numSec*sizeof(float_complex));
+        D_ls = malloc1d(nLS*nSH_sec*sizeof(float_complex));
+        for(i=0; i<nSH_sec*numSec; i++)
+            Y_enc[i] = cmplxf(Y_enc_tmp[i], 0.0f);
+        for(i=0; i<nLS*nSH_sec; i++)
+            D_ls[i] = cmplxf(D_ls_tmp[i], 0.0f);
+        free(Y_enc_tmp);
+    }
+    free(D_ls_tmp);
     
     /* mem alloc */
     saf_rfft_create(&hFFT_syn, fftsize);
@@ -301,10 +312,10 @@ void hosirrlib_render
     insig_win = calloc1d(fftsize,sizeof(float));
     inspec_syn = calloc1d(nSH*nBins_syn,sizeof(float_complex));      //////ma->ca
     inspec_anl = calloc1d(nSH*nBins_anl,sizeof(float_complex));//////ma->ca
-    WXYZ_anl = malloc1d(4*numSec*nBins_anl*sizeof(float_complex));
+    s_anl = malloc1d(4*numSec*nBins_anl*sizeof(float_complex));
     WXYZ_sec = malloc1d(4*nBins_anl*sizeof(float_complex));
-    W_diff = malloc1d(numSec*nBins_syn*sizeof(float_complex));
-    W_syn = malloc1d(nBins_syn*sizeof(float_complex));
+    z_diff = malloc1d(numSec*nBins_syn*sizeof(float_complex));
+    z_00 = malloc1d(nBins_syn*sizeof(float_complex));
     a_diff = malloc1d(nSH*nBins_syn*sizeof(float_complex));
     M_ifft = malloc1d(winsize*sizeof(float));
     M_ifft_fl = calloc1d(fftsize, sizeof(float));
@@ -335,12 +346,12 @@ void hosirrlib_render
         cblas_cgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, numSec*4, nBins_anl, nSH, &calpha,
                     sectorCoeffs, nSH,
                     inspec_anl, nBins_anl, &cbeta,
-                    WXYZ_anl, nBins_anl);
+                    s_anl, nBins_anl);
         
         /* SIRR analysis for each sector */
         for(n=0; n<numSec; n++){
             for(i=0; i<4; i++)
-                memcpy(&WXYZ_sec[i*nBins_anl], &WXYZ_anl[n*4*nBins_anl + i*nBins_anl], nBins_anl*sizeof(float_complex));
+                memcpy(&WXYZ_sec[i*nBins_anl], &s_anl[n*4*nBins_anl + i*nBins_anl], nBins_anl*sizeof(float_complex));
             
             /* compute Intensity vector for each frequency bin to estimate DoA */
             for(j=0; j<nBins_anl; j++){
@@ -409,11 +420,11 @@ void hosirrlib_render
             cblas_cgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, 1, nBins_syn, nSH, &calpha,
                         &sectorCoeffs_syn[n*4*nSH], nSH,
                         inspec_syn, nBins_syn, &cbeta,
-                        W_syn, nBins_syn);
+                        z_00, nBins_syn);
             for(i=0; i<nLS; i++)
                 for(j=0; j<nBins_syn; j++)
                     outspec_ndiff[i*nBins_syn+j] = ccaddf(outspec_ndiff[i*nBins_syn+j],
-                                                          ccmulf(ndiffgains_interp[i*nBins_syn+j], crmulf(W_syn[j], sqrtf(normSec))) );
+                                                          ccmulf(ndiffgains_interp[i*nBins_syn+j], crmulf(z_00[j], sqrtf(normSec))) );
             
             /* Interpolate diffs  */
             saf_rfft_backward(hFFT_anl, diffs_sqrt, M_ifft);
@@ -432,22 +443,28 @@ void hosirrlib_render
             }
             else{
                 for(j=0; j<nBins_syn; j++)
-                    W_diff[n*nBins_syn+j] = crmulf(ccmulf(diffgains_interp[j], W_syn[j]), 1.0f/sqrtf(numSec));
+                    z_diff[n*nBins_syn+j] = crmulf(ccmulf(diffgains_interp[j], z_00[j]), 1.0f/sqrtf(numSec));
             }
         }
         
         /* Decode diffuse stream to loudspeakers */
-        if(order>1){
-            cblas_cgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, nSH, nBins_syn, numSec, &calpha,
-                        Y_enc, numSec,
-                        W_diff, nBins_syn, &cbeta,
-                        a_diff, nBins_syn);
+        if(order==1){
+            cblas_cgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, nLS, nBins_syn, nSH, &calpha,
+                        D_ls, nSH,
+                        a_diff, nBins_syn, &cbeta,
+                        outspec_diff, nBins_syn);
         }
-        cblas_cgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, nLS, nBins_syn, nSH, &calpha,
-                    M_diff, nSH,
-                    a_diff, nBins_syn, &cbeta,
-                    outspec_diff, nBins_syn);
-        
+        else{
+            cblas_cgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, nSH_sec, nBins_syn, numSec, &calpha,
+                        Y_enc, numSec,
+                        z_diff, nBins_syn, &cbeta,
+                        a_diff, nBins_syn);
+            cblas_cgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, nLS, nBins_syn, nSH_sec, &calpha,
+                        D_ls, nSH_sec,
+                        a_diff, nBins_syn, &cbeta,
+                        outspec_diff, nBins_syn);
+        }
+
         /* Overlap-add synthesis */
         for(i=0; i<nLS; i++){
             saf_rfft_backward(hFFT_syn, &outspec_ndiff[i*nBins_syn], lsir_win);
@@ -523,8 +540,9 @@ void hosirrlib_render
     free(sectorCoeffs);
     free(sectorCoeffs_syn);
     free(win);
-    free(Y_enc);
-    free(M_diff);
+    if(order>1)
+        free(Y_enc);
+    free(D_ls);
     saf_rfft_destroy(&hFFT_syn);
     saf_rfft_destroy(&hFFT_anl);
     free(lsir_ndiff);
@@ -540,10 +558,10 @@ void hosirrlib_render
     free(insig_win);
     free(inspec_syn);
     free(inspec_anl);
-    free(WXYZ_anl);
+    free(s_anl);
     free(WXYZ_sec);
-    free(W_diff);
-    free(W_syn);
+    free(z_diff);
+    free(z_00);
     free(a_diff);
     free(M_ifft);
     free(M_ifft_fl);
