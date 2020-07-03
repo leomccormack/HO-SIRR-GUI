@@ -274,7 +274,7 @@ void hosirrlib_render
     a2eNorm = (float)nLS/(sqrtf((float)nLS));
     if(order==1){
         D_ls_tmp = malloc1d(nLS*nSH*sizeof(float));
-        getLoudspeakerAmbiDecoderMtx((float*)pData->loudpkrs_dirs_deg, nLS, LOUDSPEAKER_DECODER_SAD, order, 0, D_ls_tmp);
+        getLoudspeakerDecoderMtx((float*)pData->loudpkrs_dirs_deg, nLS, LOUDSPEAKER_DECODER_SAD, order, 0, D_ls_tmp);
         utility_svsmul(D_ls_tmp, &a2eNorm, nLS*nSH, D_ls_tmp);
         D_ls = malloc1d(nLS*nSH*sizeof(float_complex));
         for(i=0; i<nLS*nSH; i++)
@@ -284,7 +284,7 @@ void hosirrlib_render
         Y_enc_tmp = malloc1d(nSH_sec*numSec*sizeof(float));
         getRSH(order_sec, sec_dirs_deg, numSec, Y_enc_tmp);
         D_ls_tmp = malloc1d(nLS*nSH_sec*sizeof(float));
-        getLoudspeakerAmbiDecoderMtx((float*)pData->loudpkrs_dirs_deg, nLS, LOUDSPEAKER_DECODER_SAD, order_sec, 0, D_ls_tmp);
+        getLoudspeakerDecoderMtx((float*)pData->loudpkrs_dirs_deg, nLS, LOUDSPEAKER_DECODER_SAD, order_sec, 0, D_ls_tmp);
         utility_svsmul(D_ls_tmp, &a2eNorm, nLS*nSH_sec, D_ls_tmp);
         Y_enc = malloc1d(nSH_sec*numSec*sizeof(float_complex));
         D_ls = malloc1d(nLS*nSH_sec*sizeof(float_complex));
@@ -365,7 +365,7 @@ void hosirrlib_render
             cblas_cgemm(CblasRowMajor, CblasNoTrans, CblasConjTrans, 4, 4, maxDiffFreq_Ind+1, &calpha,
                         WXYZ_sec, nBins_anl,
                         WXYZ_sec, nBins_anl, &cbeta,
-                        ADR2D(pvCOV), 4);
+                        FLATTEN2D(pvCOV), 4);
             for(i=0; i<3; i++)
                 intensity[i] = crealf(pvCOV[1+i][0]);
             energy = 0.0f;
