@@ -43,19 +43,24 @@ sudo apt-get install liblapack3 liblapack-dev libopenblas-base libopenblas-dev l
 sudo apt-get install x11proto-xinerama-dev libwebkit2gtk-4.0-dev libgtk-3-dev x11proto-xext-dev libcurl4-openssl-dev libasound2-dev
 ```
 
-## Building the plug-in and App via CMake 
+## Building the plug-in via CMake 
 
 The plug-in and App may be built with CMake (version 3.15 or higher):
  ```
  mkdir build
  cmake -S . -B build
- # Linux users must link with an installed shared netcdf library:
- -DNETCDF_LIBRARY="/usr/lib/x86_64-linux-gnu/libnetcdf.so"
- # Same for MSYS2 users
- -DNETCDF_LIBRARY="/c/msys64/mingw64/lib/libnetcdf.dll.a"
  cd build
  make
  ```
+ 
+Or for Visual Studio users (using x64 Native Tools Command Prompt as **administrator**):
+```
+cmake -S . -B build -G "Visual Studio 15 Win64"
+cd build
+msbuild ALL_BUILD.vcxproj /p:Configuration=Release /m
+```
+Note: when installing CMake on Windows, make sure to allow the intaller to add CMake to the system PATH list or it won't be found.
+
 
 ## Building the plug-in and App without CMake
 
