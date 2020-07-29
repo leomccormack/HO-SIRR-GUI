@@ -108,11 +108,11 @@ private:
             durationInSeconds = (float)reader->lengthInSamples / (float)reader->sampleRate;
 
             if (reader->numChannels <= 1024 /* maximum number of channels for WAV files */) {
-                fileBuffer.setSize (reader->numChannels, (int) reader->lengthInSamples);
+                fileBuffer.setSize ((int)reader->numChannels, (int) reader->lengthInSamples);
                 reader->read (&fileBuffer, 0, (int) reader->lengthInSamples, 0, true, true);
             }
             const float** H = fileBuffer.getArrayOfReadPointers();
-            hosirrlib_setAmbiRIR(hHS, H, fileBuffer.getNumChannels(), fileBuffer.getNumSamples(), reader->sampleRate);
+            hosirrlib_setAmbiRIR(hHS, H, fileBuffer.getNumChannels(), fileBuffer.getNumSamples(), (int)reader->sampleRate);
 
         }
     }

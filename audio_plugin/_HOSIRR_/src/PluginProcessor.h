@@ -56,10 +56,10 @@ public:
     void saveConfigurationToFile (File destination);
     void loadConfiguration (const File& presetFile);
     void setLastJSONDir(File newLastDir){ lastJSONDir = newLastDir; }
-    File getLastJSONDir() {return lastJSONDir;};
+    File getLastJSONDir() {return lastJSONDir;}
     
     /* VST CanDo */
-    pointer_sized_int handleVstManufacturerSpecific (int32 /*index*/, pointer_sized_int /*value*/, void* /*ptr*/, float /*opt*/) override { return 0; };
+    pointer_sized_int handleVstManufacturerSpecific (int32 /*index*/, pointer_sized_int /*value*/, void* /*ptr*/, float /*opt*/) override { return 0; }
     pointer_sized_int handleVstPluginCanDo (int32 /*index*/, pointer_sized_int /*value*/, void* ptr, float /*opt*/) override{
         auto text = (const char*) ptr;
         auto matches = [=](const char* s) { return strcmp (text, s) == 0; };
@@ -90,7 +90,7 @@ private:
     \***************************************************************************/
 public:
     PluginProcessor();
-    ~PluginProcessor();
+    ~PluginProcessor() override;
 
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
