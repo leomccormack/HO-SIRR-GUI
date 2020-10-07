@@ -16,6 +16,8 @@
               pluginFormats="buildStandalone,buildVST" pluginChannelConfigs="{0,0}"
               jucerFormatVersion="1">
   <MAINGROUP id="imnfnp" name="HOSIRR">
+    <FILE id="BTiPhl" name="HOSIRRLookAndFeel.h" compile="0" resource="0"
+          file="../resources/HOSIRRLookAndFeel.h"/>
     <FILE id="WbSLFb" name="RIRview.cpp" compile="1" resource="0" file="src/RIRview.cpp"/>
     <FILE id="SKEgAb" name="RIRview.h" compile="0" resource="0" file="src/RIRview.h"/>
     <FILE id="YTBOMj" name="ConfigurationHelper.h" compile="0" resource="0"

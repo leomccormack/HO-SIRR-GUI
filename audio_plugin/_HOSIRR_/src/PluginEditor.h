@@ -7,12 +7,12 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.4
+  Created with Projucer version: 6.0.3
 
   ------------------------------------------------------------------------------
 
   The Projucer is part of the JUCE library.
-  Copyright (c) 2017 - ROLI Ltd.
+  Copyright (c) 2020 - Raw Material Software Limited.
 
   ==============================================================================
 */
@@ -25,11 +25,8 @@
 #include "PluginProcessor.h"
 #include "outputCoordsView.h"
 #include "RIRview.h"
-#include <time.h>
-#include <iostream>
+#include "../../resources/HOSIRRLookAndFeel.h"
 #include <thread>
-#include <string.h>
-#include <chrono>
 
 typedef enum _HOSIRR_WARNINGS{
     k_warning_none
@@ -50,14 +47,14 @@ typedef enum _HOSIRR_WARNINGS{
 class PluginEditor  : public AudioProcessorEditor,
                       public Timer,
                       private FilenameComponentListener,
-                      public ComboBox::Listener,
-                      public Slider::Listener,
-                      public Button::Listener
+                      public juce::ComboBox::Listener,
+                      public juce::Slider::Listener,
+                      public juce::Button::Listener
 {
 public:
     //==============================================================================
     PluginEditor (PluginProcessor* ownerFilter);
-    ~PluginEditor();
+    ~PluginEditor() override;
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
@@ -65,11 +62,11 @@ public:
 
     //[/UserMethods]
 
-    void paint (Graphics& g) override;
+    void paint (juce::Graphics& g) override;
     void resized() override;
-    void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
-    void sliderValueChanged (Slider* sliderThatWasMoved) override;
-    void buttonClicked (Button* buttonThatWasClicked) override;
+    void comboBoxChanged (juce::ComboBox* comboBoxThatHasChanged) override;
+    void sliderValueChanged (juce::Slider* sliderThatWasMoved) override;
+    void buttonClicked (juce::Button* buttonThatWasClicked) override;
 
 
 
@@ -83,6 +80,9 @@ private:
     int RenderingInProgress;
     double progress = 0.0;
     ProgressBar progressbar;
+
+    /* Look and Feel */
+    HOSIRRLookAndFeel LAF;
 
     /* source coordinates viewport */
     std::unique_ptr<Viewport> outputCoordsVP;
@@ -134,24 +134,24 @@ private:
     //[/UserVariables]
 
     //==============================================================================
-    std::unique_ptr<ComboBox> CBoutputDirsPreset;
-    std::unique_ptr<Slider> SL_num_loudspeakers;
-    std::unique_ptr<ComboBox> CBchFormat;
-    std::unique_ptr<ComboBox> CBnormScheme;
-    std::unique_ptr<TextButton> tb_loadJSON;
-    std::unique_ptr<TextButton> tb_saveJSON;
-    std::unique_ptr<ComboBox> CBanaOrder;
-    std::unique_ptr<TextButton> tb_render;
-    std::unique_ptr<TextButton> tb_saveRIR;
-    std::unique_ptr<Label> label_inputOrder;
-    std::unique_ptr<Label> label_inputLength;
-    std::unique_ptr<Label> label_inputSampleRate;
-    std::unique_ptr<Slider> SL_wetDryBalance;
-    std::unique_ptr<Slider> SL_windowSize;
-    std::unique_ptr<ComboBox> CBdisplayRIR;
-    std::unique_ptr<Slider> SL_displayGain;
-    std::unique_ptr<Slider> SL_displayTimeTrim;
-    std::unique_ptr<ToggleButton> tb_BroadBand1stPeak;
+    std::unique_ptr<juce::ComboBox> CBoutputDirsPreset;
+    std::unique_ptr<juce::Slider> SL_num_loudspeakers;
+    std::unique_ptr<juce::ComboBox> CBchFormat;
+    std::unique_ptr<juce::ComboBox> CBnormScheme;
+    std::unique_ptr<juce::TextButton> tb_loadJSON;
+    std::unique_ptr<juce::TextButton> tb_saveJSON;
+    std::unique_ptr<juce::ComboBox> CBanaOrder;
+    std::unique_ptr<juce::TextButton> tb_render;
+    std::unique_ptr<juce::TextButton> tb_saveRIR;
+    std::unique_ptr<juce::Label> label_inputOrder;
+    std::unique_ptr<juce::Label> label_inputLength;
+    std::unique_ptr<juce::Label> label_inputSampleRate;
+    std::unique_ptr<juce::Slider> SL_wetDryBalance;
+    std::unique_ptr<juce::Slider> SL_windowSize;
+    std::unique_ptr<juce::ComboBox> CBdisplayRIR;
+    std::unique_ptr<juce::Slider> SL_displayGain;
+    std::unique_ptr<juce::Slider> SL_displayTimeTrim;
+    std::unique_ptr<juce::ToggleButton> tb_BroadBand1stPeak;
 
 
     //==============================================================================
