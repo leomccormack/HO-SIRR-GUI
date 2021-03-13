@@ -375,6 +375,10 @@ PluginEditor::PluginEditor (PluginProcessor* ownerFilter)
     pluginDescription->setEnabled(false);
     pluginDescription->setTooltip(TRANS("An implementation of the Higher-order Spatial Impulse Response Rendering (HO-SIRR) method, which can synthesise output loudspeaker array room impulse responses (RIRs) using input spherical harmonic (Ambisonic/B-Format) RIRs of arbitrary order. The method makes assumptions regarding the composition of the sound-field and extracts spatial parameters over time and frequency, which allows it to map the input to the output in an adaptive and more informed manner when compared to linear methods such as Ambisonic decoding. The idea is that you then convolve a monophonic source with this loudspeaker array RIR, and it will be reproduced and exhibit all of the spatial characteristics of the captured space over your loudspeaker set-up.\n\n")+
                                   TRANS("The suggested workflow is: \n   1) Measure a room impulse response (RIR) of a space with a spherical microphone array (e.g. using HAART), and convert it into an Ambisonic/B-format RIR (e.g. using sparta_array2sh). \n   2) Load this B-Format/Ambisonic RIR into the HOSIRR App/plug-in and specify your loudspeaker array layout and desired rendering configuration (although, the default should suffice for most purposes).\n   3) Click \"Render\", and then \"Save\", to export the resulting loudspeaker array RIR as a multi-channel .wav file.\n   4) Then convolve this loudspeaker array RIR with a monophonic source signal, and it will be reproduced over the loudspeaker array (also exhibiting the spatial characteristics of the captured space). Plug-ins such as Xvolver, sparta_matrixconv, and mcfx_convolver, are well suited to this convolution task.\n\n "));
+    addAndMakeVisible (publicationLink);
+    publicationLink.setColour (HyperlinkButton::textColourId, Colours::lightblue);
+    publicationLink.setBounds(getBounds().getWidth()-80, 4, 80, 12);
+    publicationLink.setJustificationType(Justification::centredLeft);
 
 	/* Specify screen refresh rate */
     startTimer(80);//80); /*ms (40ms = 25 frames per second) */
