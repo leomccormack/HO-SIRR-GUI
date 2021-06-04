@@ -145,7 +145,7 @@ void hosirrlib_render
     
     /* take a local copy of current configuration to be thread safe */
     fs = pData->ambiRIRsampleRate;
-    order = MIN(pData->analysisOrder, pData->ambiRIRorder);
+    order = SAF_MIN(pData->analysisOrder, pData->ambiRIRorder);
     nSH = (order+1)*(order+1);
     winsize = pData->windowLength;
     lSig = pData->ambiRIRlength_samples;
@@ -589,7 +589,7 @@ void hosirrlib_setWindowLength(void* const hHS, int newValue)
     /* round to nearest multiple of 2 */
     pData->windowLength = newValue % 2 == 0 ? newValue : newValue + 2 - (newValue % 2);
     /* clamp within bounds */
-    pData->windowLength = CLAMP(pData->windowLength, MIN_WINDOW_LENGTH, MAX_WINDOW_LENGTH);
+    pData->windowLength = SAF_CLAMP(pData->windowLength, MIN_WINDOW_LENGTH, MAX_WINDOW_LENGTH);
     pData->lsRIR_status = LS_RIR_STATUS_NOT_RENDERED;
 }
 
@@ -623,7 +623,7 @@ int hosirrlib_setAmbiRIR
     }
     
     /* if it is, store RIR data */
-    pData->ambiRIRorder = MIN(sqrt(numChannels-1), MAX_SH_ORDER);
+    pData->ambiRIRorder = SAF_MIN(sqrt(numChannels-1), MAX_SH_ORDER);
     pData->analysisOrder = pData->ambiRIRorder;
     pData->ambiRIRlength_samples = numSamples;
     pData->ambiRIRsampleRate = sampleRate;
@@ -643,7 +643,7 @@ int hosirrlib_setAmbiRIR
 void hosirrlib_setAnalysisOrder(void* const hHS, int newValue)
 {
     hosirrlib_data *pData = (hosirrlib_data*)(hHS);
-    pData->analysisOrder = MIN(MAX(newValue,1), MAX_SH_ORDER);
+    pData->analysisOrder = SAF_MIN(SAF_MAX(newValue,1), MAX_SH_ORDER);
     /* FUMA only supports 1st order */
     if(pData->analysisOrder!=ANALYSIS_ORDER_FIRST && pData->chOrdering == CH_FUMA)
         pData->chOrdering = CH_ACN;
@@ -657,8 +657,8 @@ void hosirrlib_setLoudspeakerAzi_deg(void* const hHS, int index, float newAzi_de
     hosirrlib_data *pData = (hosirrlib_data*)(hHS);
     if(newAzi_deg>180.0f)
         newAzi_deg = -360.0f + newAzi_deg;
-    newAzi_deg = MAX(newAzi_deg, -180.0f);
-    newAzi_deg = MIN(newAzi_deg, 180.0f);
+    newAzi_deg = SAF_MAX(newAzi_deg, -180.0f);
+    newAzi_deg = SAF_MIN(newAzi_deg, 180.0f);
     pData->loudpkrs_dirs_deg[index][0] = newAzi_deg;
     pData->lsRIR_status = LS_RIR_STATUS_NOT_RENDERED;
 }
@@ -666,8 +666,8 @@ void hosirrlib_setLoudspeakerAzi_deg(void* const hHS, int index, float newAzi_de
 void hosirrlib_setLoudspeakerElev_deg(void* const hHS, int index, float newElev_deg)
 {
     hosirrlib_data *pData = (hosirrlib_data*)(hHS);
-    newElev_deg = MAX(newElev_deg, -90.0f);
-    newElev_deg = MIN(newElev_deg, 90.0f);
+    newElev_deg = SAF_MAX(newElev_deg, -90.0f);
+    newElev_deg = SAF_MIN(newElev_deg, 90.0f);
     pData->loudpkrs_dirs_deg[index][1] = newElev_deg;
     pData->lsRIR_status = LS_RIR_STATUS_NOT_RENDERED;
 }
@@ -676,7 +676,7 @@ void hosirrlib_setNumLoudspeakers(void* const hHS, int new_nLoudspeakers)
 {
     hosirrlib_data *pData = (hosirrlib_data*)(hHS);
     pData->nLoudpkrs = new_nLoudspeakers > MAX_NUM_LOUDSPEAKERS ? MAX_NUM_LOUDSPEAKERS : new_nLoudspeakers;
-    pData->nLoudpkrs = MAX(MIN_NUM_LOUDSPEAKERS, pData->nLoudpkrs);
+    pData->nLoudpkrs = SAF_MAX(MIN_NUM_LOUDSPEAKERS, pData->nLoudpkrs);
     pData->lsRIR_status = LS_RIR_STATUS_NOT_RENDERED;
 }
 
