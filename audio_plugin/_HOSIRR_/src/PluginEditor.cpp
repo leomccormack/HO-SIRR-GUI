@@ -1024,11 +1024,13 @@ void PluginEditor::buttonClicked (juce::Button* buttonThatWasClicked)
         FileChooser myChooser ("Load configuration...",
                                hVst->getLastJSONDir().exists() ? hVst->getLastJSONDir() : File::getSpecialLocation (File::userHomeDirectory),
                                "*.json");
-        if (myChooser.browseForFileToOpen()) {
-            File configFile (myChooser.getResult());
+        auto folderChooserFlags = FileBrowserComponent::openMode | FileBrowserComponent::canSelectDirectories;
+        myChooser.launchAsync (folderChooserFlags, [this] (const FileChooser& chooser)
+        {
+            File configFile (chooser.getResult());
             hVst->setLastJSONDir(configFile.getParentDirectory());
             hVst->loadConfiguration (configFile);
-        }
+        });
         //[/UserButtonCode_tb_loadJSON]
     }
     else if (buttonThatWasClicked == tb_saveJSON.get())
@@ -1037,11 +1039,13 @@ void PluginEditor::buttonClicked (juce::Button* buttonThatWasClicked)
         FileChooser myChooser ("Save configuration...",
                                hVst->getLastJSONDir().exists() ? hVst->getLastJSONDir() : File::getSpecialLocation (File::userHomeDirectory),
                                "*.json");
-        if (myChooser.browseForFileToSave (true)) {
-            File configFile (myChooser.getResult());
+        auto folderChooserFlags = FileBrowserComponent::openMode | FileBrowserComponent::canSelectDirectories;
+        myChooser.launchAsync (folderChooserFlags, [this] (const FileChooser& chooser)
+        {
+            File configFile (chooser.getResult());
             hVst->setLastJSONDir(configFile.getParentDirectory());
             hVst->saveConfigurationToFile (configFile);
-        }
+        });
         //[/UserButtonCode_tb_saveJSON]
     }
     else if (buttonThatWasClicked == tb_render.get())
@@ -1064,12 +1068,14 @@ void PluginEditor::buttonClicked (juce::Button* buttonThatWasClicked)
 
         if(hosirrlib_getLsRIRstatus(hHS)==LS_RIR_STATUS_RENDERED){
             /* ask user, where to save */
-            File outputFile;
-            FileChooser myChooser ("Save configuration...",
+            FileChooser myChooser ("Save file...",
                                    hVst->getSaveWavDirectory().exists() ? hVst->getSaveWavDirectory() : File::getSpecialLocation (File::userHomeDirectory),
-                                    "*.wav");
-            if (myChooser.browseForFileToSave (true)) {
-                outputFile = (myChooser.getResult());
+                                   "*.json");
+            auto folderChooserFlags = FileBrowserComponent::openMode | FileBrowserComponent::canSelectDirectories;
+            myChooser.launchAsync (folderChooserFlags, [this] (const FileChooser& chooser)
+            {
+                File outputFile;
+                outputFile = (chooser.getResult());
                 hVst->setSaveWavDirectory(outputFile.getParentDirectory());
 
                 /* fill audio buffer */
@@ -1088,9 +1094,8 @@ void PluginEditor::buttonClicked (juce::Button* buttonThatWasClicked)
                 if (writer != nullptr)
                     writer->writeFromAudioSampleBuffer(buffer, 0, buffer.getNumSamples());
                 writer = nullptr;
-            }
-         }
-
+            });
+        }
         //[/UserButtonCode_tb_saveRIR]
     }
     else if (buttonThatWasClicked == tb_BroadBand1stPeak.get())
