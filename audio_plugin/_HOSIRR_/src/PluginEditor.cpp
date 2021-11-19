@@ -1021,30 +1021,33 @@ void PluginEditor::buttonClicked (juce::Button* buttonThatWasClicked)
     if (buttonThatWasClicked == tb_loadJSON.get())
     {
         //[UserButtonCode_tb_loadJSON] -- add your button handler code here..
-        FileChooser myChooser ("Load configuration...",
-                               hVst->getLastJSONDir().exists() ? hVst->getLastJSONDir() : File::getSpecialLocation (File::userHomeDirectory),
-                               "*.json");
-        auto folderChooserFlags = FileBrowserComponent::openMode | FileBrowserComponent::canSelectDirectories;
-        myChooser.launchAsync (folderChooserFlags, [this] (const FileChooser& chooser)
-        {
-            File configFile (chooser.getResult());
-            hVst->setLastJSONDir(configFile.getParentDirectory());
-            hVst->loadConfiguration (configFile);
+        chooser = std::make_unique<juce::FileChooser> ("Load configuration...",
+                                                       hVst->getLastJSONDir().exists() ? hVst->getLastJSONDir() : File::getSpecialLocation (File::userHomeDirectory),
+                                                       "*.json");
+        auto chooserFlags = juce::FileBrowserComponent::openMode
+                                  | juce::FileBrowserComponent::canSelectFiles;
+        chooser->launchAsync (chooserFlags, [this] (const FileChooser& fc) {
+            auto file = fc.getResult();
+            if (file != File{}){
+                hVst->setLastJSONDir(file.getParentDirectory());
+                hVst->loadConfiguration (file);
+            }
         });
         //[/UserButtonCode_tb_loadJSON]
     }
     else if (buttonThatWasClicked == tb_saveJSON.get())
     {
         //[UserButtonCode_tb_saveJSON] -- add your button handler code here..
-        FileChooser myChooser ("Save configuration...",
-                               hVst->getLastJSONDir().exists() ? hVst->getLastJSONDir() : File::getSpecialLocation (File::userHomeDirectory),
-                               "*.json");
-        auto folderChooserFlags = FileBrowserComponent::openMode | FileBrowserComponent::canSelectDirectories;
-        myChooser.launchAsync (folderChooserFlags, [this] (const FileChooser& chooser)
-        {
-            File configFile (chooser.getResult());
-            hVst->setLastJSONDir(configFile.getParentDirectory());
-            hVst->saveConfigurationToFile (configFile);
+        chooser = std::make_unique<juce::FileChooser> ("Save configuration...",
+                                                       hVst->getLastJSONDir().exists() ? hVst->getLastJSONDir() : File::getSpecialLocation (File::userHomeDirectory),
+                                                       "*.json");
+        auto chooserFlags = juce::FileBrowserComponent::saveMode;
+        chooser->launchAsync (chooserFlags, [this] (const FileChooser& fc) {
+            auto file = fc.getResult();
+            if (file != File{}) {
+                hVst->setLastJSONDir(file.getParentDirectory());
+                hVst->saveConfigurationToFile (file);
+            }
         });
         //[/UserButtonCode_tb_saveJSON]
     }
@@ -1059,41 +1062,40 @@ void PluginEditor::buttonClicked (juce::Button* buttonThatWasClicked)
                 std::cout << "Could not create thread to render" << exception.what() << std::endl;
             }
         }
-
         //[/UserButtonCode_tb_render]
     }
     else if (buttonThatWasClicked == tb_saveRIR.get())
     {
         //[UserButtonCode_tb_saveRIR] -- add your button handler code here..
-
         if(hosirrlib_getLsRIRstatus(hHS)==LS_RIR_STATUS_RENDERED){
             /* ask user, where to save */
-            FileChooser myChooser ("Save file...",
-                                   hVst->getSaveWavDirectory().exists() ? hVst->getSaveWavDirectory() : File::getSpecialLocation (File::userHomeDirectory),
-                                   "*.json");
-            auto folderChooserFlags = FileBrowserComponent::openMode | FileBrowserComponent::canSelectDirectories;
-            myChooser.launchAsync (folderChooserFlags, [this] (const FileChooser& chooser)
-            {
-                File outputFile;
-                outputFile = (chooser.getResult());
-                hVst->setSaveWavDirectory(outputFile.getParentDirectory());
+            chooser = std::make_unique<juce::FileChooser> ("Save wav...",
+                                                           hVst->getSaveWavDirectory().exists() ? hVst->getSaveWavDirectory() : File::getSpecialLocation (File::userHomeDirectory),
+                                                           "*.wav");
+            auto chooserFlags = juce::FileBrowserComponent::saveMode;
+            chooser->launchAsync (chooserFlags, [this] (const FileChooser& fc) {
+                auto file = fc.getResult();
+                if (file != File{}) {
+                    hVst->setSaveWavDirectory(file.getParentDirectory());
 
-                /* fill audio buffer */
-                AudioBuffer<float> buffer;
-                buffer.setSize(hosirrlib_getNumLoudspeakers(hHS), hosirrlib_getAmbiRIRlength_samples(hHS));
-                buffer.clear();
-                float** lsRIR = buffer.getArrayOfWritePointers();
-                hosirrlib_getLsRIR(hHS, lsRIR);
+                    /* fill audio buffer */
+                    AudioBuffer<float> buffer;
+                    buffer.setSize(hosirrlib_getNumLoudspeakers(hHS), hosirrlib_getAmbiRIRlength_samples(hHS));
+                    buffer.clear();
+                    float** lsRIR = buffer.getArrayOfWritePointers();
+                    hosirrlib_getLsRIR(hHS, lsRIR);
 
-                /* write audio buffer to disk */
-                WavAudioFormat wavFormat;
-                std::unique_ptr<AudioFormatWriter> writer;
-                outputFile.deleteFile();
-                writer.reset (wavFormat.createWriterFor (new FileOutputStream (outputFile), (double)hosirrlib_getAmbiRIRsampleRate(hHS),
-                                                         (unsigned int)hosirrlib_getNumLoudspeakers(hHS), 24, {}, 0));
-                if (writer != nullptr)
-                    writer->writeFromAudioSampleBuffer(buffer, 0, buffer.getNumSamples());
-                writer = nullptr;
+                    /* write audio buffer to disk */
+                    WavAudioFormat wavFormat;
+                    std::unique_ptr<AudioFormatWriter> writer;
+                    file.deleteFile();
+                    writer.reset (wavFormat.createWriterFor (new FileOutputStream (file), (double)hosirrlib_getAmbiRIRsampleRate(hHS),
+                                                             (unsigned int)hosirrlib_getNumLoudspeakers(hHS), 24, {}, 0));
+                    if (writer != nullptr){
+                        writer->writeFromAudioSampleBuffer(buffer, 0, buffer.getNumSamples());
+                    }
+                    writer = nullptr;
+                }
             });
         }
         //[/UserButtonCode_tb_saveRIR]

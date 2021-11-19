@@ -89,6 +89,9 @@ private:
     outputCoordsView* outputCoordsView_handle;
     FilenameComponent fileChooser;
 
+    /* json file loading/saving */
+    std::unique_ptr<juce::FileChooser> chooser;
+
     /* wav file loading */
     AudioFormatManager formatManager;
     AudioSampleBuffer fileBuffer;

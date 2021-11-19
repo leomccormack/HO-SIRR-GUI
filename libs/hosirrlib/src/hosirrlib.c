@@ -121,7 +121,7 @@ void hosirrlib_render
     float fc[6] = {125.0f, 250.0f, 500.0f, 1000.0f, 2000.0f, 4000.0f};
     float IntensityBB[3] = {0.0f};
     float IntensityBB_XYZ[3];
-    float* shir, *shir_tmp, *direct_win, *shir_direct, *shir_pad, *gtable, *sec_dirs_deg, *sectorCoeffs_tmp;
+    float* shir, *shir_tmp, *shir_tmp2, *direct_win, *shir_direct, *shir_pad, *gtable, *sec_dirs_deg, *sectorCoeffs_tmp;
     float* lsir_ndiff, *lsir_diff, *win, *Y_enc_tmp, *D_ls_tmp;
     float* prev_diff_energy, *prev_diff_intensity, *azim, *elev, *diffs;
     float* insig_win, *ndiffs_sqrt, *lsir_win, *M_ifft, *M_ifft_fl, *rir_filt;
@@ -200,6 +200,7 @@ void hosirrlib_render
             BB1stPeak=0;
         else{
             shir_tmp = malloc1d(nSH*lSig*sizeof(float));
+            shir_tmp2 = malloc1d(nSH*lSig*sizeof(float));
             memcpy(shir_tmp, shir, nSH*lSig*sizeof(float));
             direct_win = calloc1d(nSH*lSig,sizeof(float));
             for(i=0; i<nSH; i++)
@@ -210,10 +211,11 @@ void hosirrlib_render
             /* flip window and use it to remove peak from the input */
             for(i=0; i<nSH*lSig; i++)
                 direct_win[i] = 1.0f-direct_win[i];
-            utility_svvmul(shir_tmp, direct_win, nSH*lSig, shir_tmp);
-            memcpy(shir, shir_tmp, nSH*lSig*sizeof(float));
+            utility_svvmul(shir_tmp, direct_win, nSH*lSig, shir_tmp2);
+            memcpy(shir, shir_tmp2, nSH*lSig*sizeof(float));
             
             free(shir_tmp);
+            free(shir_tmp2);
             free(direct_win);
         }
     }
