@@ -75,8 +75,10 @@ private:
     PluginProcessor* hVst;
     void* hHS;
     void timerCallback() override;
+#ifndef PLUGIN_EDITOR_DISABLE_OPENGL
     std::unique_ptr<OpenGLGraphicsContextCustomShader> shader;
     OpenGLContext openGLContext;
+#endif
     int RenderingInProgress;
     double progress = 0.0;
     ProgressBar progressbar;
