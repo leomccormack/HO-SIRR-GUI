@@ -606,7 +606,7 @@ void hosirrlib_setWetDryBalance(void* const hHS, float newValue)
 int hosirrlib_setAmbiRIR
 (
     void* const hHS,
-    const float** H,
+    const float* const* H,
     int numChannels,
     int numSamples,
     int sampleRate
@@ -762,7 +762,7 @@ int hosirrlib_getBroadBandFirstPeakFLAG(void* const hHS)
     return pData->broadBandFirstPeakFLAG;
 }
 
-void hosirrlib_getLsRIR(void* const hHS, float** lsRIR)
+void hosirrlib_getLsRIR(void* const hHS, float* const* lsRIR)
 {
     hosirrlib_data *pData = (hosirrlib_data*)(hHS);
     int i;

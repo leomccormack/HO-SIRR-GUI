@@ -1084,7 +1084,7 @@ void PluginEditor::buttonClicked (juce::Button* buttonThatWasClicked)
                     AudioBuffer<float> buffer;
                     buffer.setSize(hosirrlib_getNumLoudspeakers(hHS), hosirrlib_getAmbiRIRlength_samples(hHS));
                     buffer.clear();
-                    float** lsRIR = buffer.getArrayOfWritePointers();
+                    float* const* lsRIR = buffer.getArrayOfWritePointers();
                     hosirrlib_getLsRIR(hHS, lsRIR);
 
                     /* write audio buffer to disk */

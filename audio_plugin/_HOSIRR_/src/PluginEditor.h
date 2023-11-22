@@ -116,7 +116,7 @@ private:
                 fileBuffer.setSize ((int)reader->numChannels, (int) reader->lengthInSamples);
                 reader->read (&fileBuffer, 0, (int) reader->lengthInSamples, 0, true, true);
             }
-            const float** H = fileBuffer.getArrayOfReadPointers();
+            const float* const* H = fileBuffer.getArrayOfReadPointers();
             hosirrlib_setAmbiRIR(hHS, H, fileBuffer.getNumChannels(), fileBuffer.getNumSamples(), (int)reader->sampleRate);
 
         }

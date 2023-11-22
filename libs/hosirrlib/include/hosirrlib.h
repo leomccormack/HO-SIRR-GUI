@@ -227,7 +227,7 @@ void hosirrlib_setWetDryBalance(void* const hHS, float newValue);
  * @param[in] sampleRate  Sample rate of the loaded H
  */
 int hosirrlib_setAmbiRIR(void* const hHS,
-                         const float** H,
+                         const float* const* H,
                          int numChannels,
                          int numSamples,
                          int sampleRate);
@@ -337,7 +337,7 @@ float hosirrlib_getProgress0_1(void* const hHS);
  */
 void hosirrlib_getProgressText(void* const hHS, char* text);
     
-void hosirrlib_getLsRIR(void* const hHS, float** lsRIR);
+void hosirrlib_getLsRIR(void* const hHS, float* const* lsRIR);
     
 /**
  * Returns the master/maximum decoding order (see 'ANALYSIS_ORDERS' enum)
