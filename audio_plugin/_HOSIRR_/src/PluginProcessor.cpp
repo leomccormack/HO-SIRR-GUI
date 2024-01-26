@@ -25,8 +25,8 @@
 
 PluginProcessor::PluginProcessor() : 
 	AudioProcessor(BusesProperties()
-		.withInput("Input", AudioChannelSet::discreteChannels(64), true)
-	    .withOutput("Output", AudioChannelSet::discreteChannels(64), true))
+		.withInput("Input", AudioChannelSet::discreteChannels(MAX_NUM_CHANNELS), true)
+	    .withOutput("Output", AudioChannelSet::discreteChannels(MAX_NUM_CHANNELS), true))
 {
 	hosirrlib_create(&hHS);
 }
