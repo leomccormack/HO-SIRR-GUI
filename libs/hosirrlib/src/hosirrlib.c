@@ -248,7 +248,7 @@ void hosirrlib_render
     normSec = computeSectorCoeffsEP(order_sec, A_xyz, SECTOR_PATTERN_PWD, sec_dirs_deg, numSec, sectorCoeffs_tmp);
     for(i=0; i<numSec*4*nSH; i++){
         sectorCoeffs[i] = cmplxf(sectorCoeffs_tmp[i], 0.0f); /* real->complex data type */
-        sectorCoeffs_syn[i] = cmplxf(sectorCoeffs_tmp[i]/sqrtf(4.0f*M_PI), 0.0f);
+        sectorCoeffs_syn[i] = cmplxf(sectorCoeffs_tmp[i]/sqrtf(4.0f*SAF_PI), 0.0f);
     }
     free(sectorCoeffs_tmp);
     free(A_xyz);
@@ -270,7 +270,7 @@ void hosirrlib_render
     /* transform window (symmetric Hann - 'hanning' in matlab) */
     win = malloc1d(winsize*sizeof(float));
     for(i=0; i<winsize; i++)
-        win[i] = powf(sinf((float)i*(M_PI/(float)winsize)), 2.0f);
+        win[i] = powf(sinf((float)i*(SAF_PI/(float)winsize)), 2.0f);
     
     /* diffuse stream rendering intialisations */
     a2eNorm = (float)nLS/(sqrtf((float)nLS));
@@ -359,8 +359,8 @@ void hosirrlib_render
             for(j=0; j<nBins_anl; j++){
                 for(i=0; i<3; i++)
                     intensity[i] = crealf( ccmulf(conjf(WXYZ_sec[j]), WXYZ_sec[(i+1)*nBins_anl+j]));
-                azim[n*nBins_anl+j] = atan2f(intensity[1], intensity[0])*180.0f/M_PI;
-                elev[n*nBins_anl+j] = atan2f(intensity[2], sqrtf(powf(intensity[0], 2.0f) + powf(intensity[1], 2.0f)))*180.0f/M_PI;
+                azim[n*nBins_anl+j] = atan2f(intensity[1], intensity[0])*180.0f/SAF_PI;
+                elev[n*nBins_anl+j] = atan2f(intensity[2], sqrtf(powf(intensity[0], 2.0f) + powf(intensity[1], 2.0f)))*180.0f/SAF_PI;
             }
                 
             /* Compute broad-band active-intensity vector */
@@ -508,8 +508,8 @@ void hosirrlib_render
         
         /* Get gtable index for DoA */
         N_azi = (int)(360.0f / aziRes + 0.5f) + 1;
-        aziIndex = (int)(matlab_fmodf( (atan2f(IntensityBB_XYZ[1], IntensityBB_XYZ[0]) *180.0f/M_PI) + 180.0f, 360.0f) / (float)aziRes + 0.5f);
-        elevIndex = (int)(((atan2f(IntensityBB_XYZ[2], sqrtf(powf(IntensityBB_XYZ[0], 2.0f) + powf(IntensityBB_XYZ[1], 2.0f)))*180.0f/M_PI) + 90.0f) / (float)elevRes + 0.5f);
+        aziIndex = (int)(matlab_fmodf( (atan2f(IntensityBB_XYZ[1], IntensityBB_XYZ[0]) *180.0f/SAF_PI) + 180.0f, 360.0f) / (float)aziRes + 0.5f);
+        elevIndex = (int)(((atan2f(IntensityBB_XYZ[2], sqrtf(powf(IntensityBB_XYZ[0], 2.0f) + powf(IntensityBB_XYZ[1], 2.0f)))*180.0f/SAF_PI) + 90.0f) / (float)elevRes + 0.5f);
         idx3d = elevIndex * N_azi + aziIndex;
         
         /* pan omni and sum to non-diffuse stream */
