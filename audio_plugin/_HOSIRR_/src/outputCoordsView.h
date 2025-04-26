@@ -1,51 +1,37 @@
 /*
-  ==============================================================================
-
-  This is an automatically generated GUI class created by the Projucer!
-
-  Be careful when adding custom code to these files, as only the code within
-  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
-  and re-saved.
-
-  Created with Projucer version: 6.0.3
-
-  ------------------------------------------------------------------------------
-
-  The Projucer is part of the JUCE library.
-  Copyright (c) 2020 - Raw Material Software Limited.
-
-  ==============================================================================
-*/
+ ==============================================================================
+ 
+ This file is part of HOSIRR
+ Copyright (c) 2020 - Leo McCormack
+ 
+ HOSIRR is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ 
+ HOSIRR is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with HOSIRR.  If not, see <http://www.gnu.org/licenses/>.
+ 
+ ==============================================================================
+ */
 
 #pragma once
-
-//[Headers]     -- You can add your own extra header files here --
 
 #include "JuceHeader.h"
 #include "PluginProcessor.h"
 
-//[/Headers]
-
-
-
-//==============================================================================
-/**
-                                                                    //[Comments]
-    An auto-generated component, created by the Projucer.
-
-    Describe your class and how it works here!
-                                                                    //[/Comments]
-*/
 class outputCoordsView  : public Component,
                           public juce::Slider::Listener
 {
 public:
-    //==============================================================================
     outputCoordsView (PluginProcessor* ownerFilter, int _maxNCH, int _currentNCH );
     ~outputCoordsView() override;
-
-    //==============================================================================
-    //[UserMethods]     -- You can add your own custom methods in this section.
+    
     void setNCH(int newNCH){
 		newNCH = newNCH > MAX_NUM_CHANNELS ? MAX_NUM_CHANNELS : newNCH;
         refreshCoords();
@@ -59,16 +45,11 @@ public:
     bool getHasASliderChanged(){ return sliderHasChanged; }
     void setHasASliderChange(bool newState){ sliderHasChanged = newState; }
 
-    //[/UserMethods]
-
     void paint (juce::Graphics& g) override;
     void resized() override;
     void sliderValueChanged (juce::Slider* sliderThatWasMoved) override;
 
-
-
 private:
-    //[UserVariables]   -- You can add your own custom variables in this section.
     PluginProcessor* hVst;
     void* hHS;
     void refreshCoords();
@@ -79,16 +60,7 @@ private:
     /* tooltips */
     SharedResourcePointer<TooltipWindow> tipWindow;
 
-    //[/UserVariables]
-
-    //==============================================================================
     std::unique_ptr<juce::Slider> dummySlider;
 
-
-    //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (outputCoordsView)
 };
-
-//[EndFile] You can add extra defines here...
-//[/EndFile]
-

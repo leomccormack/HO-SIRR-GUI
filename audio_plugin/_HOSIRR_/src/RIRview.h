@@ -1,25 +1,27 @@
 /*
-  ==============================================================================
-
-  This is an automatically generated GUI class created by the Projucer!
-
-  Be careful when adding custom code to these files, as only the code within
-  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
-  and re-saved.
-
-  Created with Projucer version: 5.4.4
-
-  ------------------------------------------------------------------------------
-
-  The Projucer is part of the JUCE library.
-  Copyright (c) 2017 - ROLI Ltd.
-
-  ==============================================================================
-*/
+ ==============================================================================
+ 
+ This file is part of HOSIRR
+ Copyright (c) 2020 - Leo McCormack
+ 
+ HOSIRR is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ 
+ HOSIRR is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with HOSIRR.  If not, see <http://www.gnu.org/licenses/>.
+ 
+ ==============================================================================
+ */
 
 #pragma once
 
-//[Headers]     -- You can add your own extra header files here --
 #include <JuceHeader.h>
 
 typedef enum _RIR_VIEW_WAV_LABELS{
@@ -37,28 +39,12 @@ const String SHLabels[64] = {"Y00", "Y1(-1)", "Y10", "Y11", "Y2(-2)", "Y2(-1)", 
     "Y7(-2)", "Y7(-1)", "Y70", "Y71", "Y72", "Y73", "Y74", "Y75", "Y76","Y77"
 };
 
-//[/Headers]
-
-
-
-//==============================================================================
-/**
-                                                                    //[Comments]
-    An auto-generated component, created by the Projucer.
-
-    Describe your class and how it works here!
-                                                                    //[/Comments]
-*/
 class RIRview  : public Component,
                  private ChangeListener
 {
 public:
-    //==============================================================================
     RIRview (int sourceSamplesPerThumbnailSample, AudioFormatManager& formatManager, AudioThumbnailCache& cache, int width, int height);
     ~RIRview();
-
-    //==============================================================================
-    //[UserMethods]     -- You can add your own custom methods in this section.
 
     void setFile (const File& file)
     {
@@ -132,15 +118,10 @@ public:
         thumbnailChanged();
     }
 
-    //[/UserMethods]
-
     void paint (Graphics& g) override;
     void resized() override;
 
-
-
 private:
-    //[UserVariables]   -- You can add your own custom variables in this section.
     void thumbnailChanged()
     {
         repaint();
@@ -150,15 +131,6 @@ private:
     int compHeight, compWidth;
     RIR_VIEW_WAV_LABELS labels;
     float timeTrim, gain_dB, gain_lin;
-    //[/UserVariables]
 
-    //==============================================================================
-
-
-    //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (RIRview)
 };
-
-//[EndFile] You can add extra defines here...
-//[/EndFile]
-
