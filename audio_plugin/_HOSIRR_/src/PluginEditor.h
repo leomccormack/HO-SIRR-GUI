@@ -41,7 +41,7 @@ class PluginEditor  : public AudioProcessorEditor,
                       public juce::Button::Listener
 {
 public:
-    PluginEditor (PluginProcessor* ownerFilter);
+    PluginEditor (PluginProcessor& p);
     ~PluginEditor() override;
 
     void paint (juce::Graphics& g) override;
@@ -51,7 +51,7 @@ public:
     void buttonClicked (juce::Button* buttonThatWasClicked) override;
 
 private:
-    PluginProcessor* hVst;
+    PluginProcessor& processor;
     void* hHS;
     void timerCallback() override;
 #ifndef PLUGIN_EDITOR_DISABLE_OPENGL
@@ -79,13 +79,13 @@ private:
     float durationInSeconds;
     void filenameComponentChanged (FilenameComponent*) override  {
         String directory = fileChooser.getCurrentFile().getFullPathName();
-        hVst->setLoadWavDirectory(directory);
+        processor.setLoadWavDirectory(directory);
         loadWavFile();
         thumbnailComp->setFile(fileChooser.getCurrentFile());
     }
     void loadWavFile()
     {
-        String directory = hVst->getLoadWavDirectory();
+        String directory = processor.getLoadWavDirectory();
         std::unique_ptr<AudioFormatReader> reader (formatManager.createReaderFor (directory));
 
         if (reader.get() != nullptr) { /* if file exists */
@@ -118,12 +118,12 @@ private:
     HyperlinkButton publicationLink { "(Related Publication)", { "https://leomccormack.github.io/sparta-site/docs/help/related-publications/mccormack2020higher.pdf" } };
 
     std::unique_ptr<juce::ComboBox> CBoutputDirsPreset;
-    std::unique_ptr<juce::Slider> SL_num_loudspeakers;
-    std::unique_ptr<juce::ComboBox> CBchFormat;
-    std::unique_ptr<juce::ComboBox> CBnormScheme;
+    std::unique_ptr<SliderWithAttachment> SL_num_loudspeakers;
+    std::unique_ptr<ComboBoxWithAttachment> CBchFormat;
+    std::unique_ptr<ComboBoxWithAttachment> CBnormScheme;
     std::unique_ptr<juce::TextButton> tb_loadJSON;
     std::unique_ptr<juce::TextButton> tb_saveJSON;
-    std::unique_ptr<juce::ComboBox> CBanaOrder;
+    std::unique_ptr<ComboBoxWithAttachment> CBanaOrder;
     std::unique_ptr<juce::TextButton> tb_render;
     std::unique_ptr<juce::TextButton> tb_saveRIR;
     std::unique_ptr<juce::Label> label_inputOrder;

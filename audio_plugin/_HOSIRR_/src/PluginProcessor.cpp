@@ -23,12 +23,74 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
-PluginProcessor::PluginProcessor() : 
+juce::AudioProcessorValueTreeState::ParameterLayout PluginProcessor::createParameterLayout()
+{
+    std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
+    
+    params.push_back(std::make_unique<juce::AudioParameterChoice>("inputOrder", "InputOrder",
+                                                                  juce::StringArray{"1st order","2nd order","3rd order","4th order","5th order","6th order","7th order"}, 0,
+                                                                  AudioParameterChoiceAttributes().withAutomatable(false)));
+    params.push_back(std::make_unique<juce::AudioParameterChoice>("channelOrder", "ChannelOrder", juce::StringArray{"ACN", "FuMa"}, 0));
+    params.push_back(std::make_unique<juce::AudioParameterChoice>("normType", "NormType", juce::StringArray{"N3D", "SN3D", "FuMa"}, 1));
+    params.push_back(std::make_unique<juce::AudioParameterInt>("numLoudspeakers", "NumLoudspeakers", 4, HOSIRR_MAX_NUM_OUTPUTS, 1,
+                                                               AudioParameterIntAttributes().withAutomatable(false)));
+    for(int i=0; i<HOSIRR_MAX_NUM_OUTPUTS; i++){
+        params.push_back(std::make_unique<juce::AudioParameterFloat>("azim" + juce::String(i), "Azim_" + juce::String(i+1), juce::NormalisableRange<float>(-180.0f, 180.0f, 0.01f), 0.0f, AudioParameterFloatAttributes().withAutomatable(false)));
+        params.push_back(std::make_unique<juce::AudioParameterFloat>("elev" + juce::String(i), "Elev_" + juce::String(i+1), juce::NormalisableRange<float>(-90.0f, 90.0f, 0.01f), 0.0f, AudioParameterFloatAttributes().withAutomatable(false)));
+    }
+    
+    
+    return { params.begin(), params.end() };
+}
+
+void PluginProcessor::parameterChanged(const juce::String& parameterID, float newValue)
+{
+   if (parameterID == "inputOrder"){
+       hosirrlib_setAnalysisOrder(hHS, static_cast<int>(newValue+1.001f));
+    }
+    else if (parameterID == "channelOrder"){
+        hosirrlib_setChOrder(hHS, static_cast<int>(newValue+1.001f));
+    }
+    else if (parameterID == "normType"){
+        hosirrlib_setNormType(hHS, static_cast<int>(newValue+1.001f));
+    }
+    else if(parameterID == "numLoudspeakers"){
+        hosirrlib_setNumLoudspeakers(hHS, static_cast<int>(newValue));
+    }
+    for(int i=0; i<HOSIRR_MAX_NUM_OUTPUTS; i++){
+        if(parameterID == "azim" + juce::String(i)){
+            hosirrlib_setLoudspeakerAzi_deg(hHS, i, newValue);
+            break;
+        }
+        else if(parameterID == "elev" + juce::String(i)){
+            hosirrlib_setLoudspeakerElev_deg(hHS, i, newValue);
+            break;
+        }
+    }
+}
+
+void PluginProcessor::setParameterValuesUsingInternalState()
+{
+    setParameterValue("inputOrder", hosirrlib_getAnalysisOrder(hHS)-1);
+    setParameterValue("channelOrder", hosirrlib_getChOrder(hHS)-1);
+    setParameterValue("normType", hosirrlib_getNormType(hHS)-1);
+    setParameterValue("numLoudspeakers", hosirrlib_getNumLoudspeakers(hHS));
+    for(int i=0; i<HOSIRR_MAX_NUM_OUTPUTS; i++){
+        setParameterValue("azim" + juce::String(i), hosirrlib_getLoudspeakerAzi_deg(hHS, i));
+        setParameterValue("elev" + juce::String(i), hosirrlib_getLoudspeakerElev_deg(hHS, i));
+    }
+}
+
+PluginProcessor::PluginProcessor() :
 	AudioProcessor(BusesProperties()
 		.withInput("Input", AudioChannelSet::discreteChannels(MAX_NUM_CHANNELS), true)
-	    .withOutput("Output", AudioChannelSet::discreteChannels(MAX_NUM_CHANNELS), true))
+	    .withOutput("Output", AudioChannelSet::discreteChannels(MAX_NUM_CHANNELS), true)),
+    ParameterManager(*this, createParameterLayout())
 {
 	hosirrlib_create(&hHS);
+    
+    /* Grab defaults */
+    setParameterValuesUsingInternalState();
 }
 
 PluginProcessor::~PluginProcessor()
@@ -36,135 +98,13 @@ PluginProcessor::~PluginProcessor()
 	hosirrlib_destroy(&hHS);
 }
 
-void PluginProcessor::setParameter (int index, float newValue)
-{
-    /* standard parameters */
-    if(index < k_NumOfParameters){
-        switch (index) {
-            case k_analysisOrder:   hosirrlib_setAnalysisOrder(hHS, (ANALYSIS_ORDERS)(int)(newValue*(float)(HOSIRR_MAX_SH_ORDER-1) + 1.5f)); break;
-            case k_channelOrder:    hosirrlib_setChOrder(hHS, (int)(newValue*(float)(HOSIRR_NUM_CH_ORDERINGS-1) + 1.5f)); break;
-            case k_normType:        hosirrlib_setNormType(hHS, (int)(newValue*(float)(HOSIRR_NUM_NORM_TYPES-1) + 1.5f)); break;
-            case k_numLoudspeakers: hosirrlib_setNumLoudspeakers(hHS, (int)(newValue*(float)(HOSIRR_MAX_NUM_OUTPUTS)+0.5)); break;
-        }
-    }
-    /* loudspeaker direction parameters */
-    else{
-        index-=k_NumOfParameters;
-        float newValueScaled;
-        if (!(index % 2)){
-            newValueScaled = (newValue - 0.5f)*360.0f;
-            if (newValueScaled != hosirrlib_getLoudspeakerAzi_deg(hHS, index/2))
-                hosirrlib_setLoudspeakerAzi_deg(hHS, index/2, newValueScaled);
-        }
-        else{
-            newValueScaled = (newValue - 0.5f)*180.0f;
-            if (newValueScaled != hosirrlib_getLoudspeakerElev_deg(hHS, index/2))
-                hosirrlib_setLoudspeakerElev_deg(hHS, index/2, newValueScaled);
-        }
-    }
-}
-
 void PluginProcessor::setCurrentProgram (int /*index*/)
 {
-}
-
-float PluginProcessor::getParameter (int index)
-{
-    /* standard parameters */
-    if(index < k_NumOfParameters){
-        switch (index) {
-            case k_analysisOrder:   return (float)(hosirrlib_getAnalysisOrder(hHS)-1)/(float)(HOSIRR_MAX_SH_ORDER-1);
-            case k_channelOrder:    return (float)(hosirrlib_getChOrder(hHS)-1)/(float)(HOSIRR_NUM_CH_ORDERINGS-1);
-            case k_normType:        return (float)(hosirrlib_getNormType(hHS)-1)/(float)(HOSIRR_NUM_NORM_TYPES-1);
-            case k_numLoudspeakers: return (float)(hosirrlib_getNumLoudspeakers(hHS))/(float)(HOSIRR_MAX_NUM_OUTPUTS);
-            default: return 0.0f;
-        }
-    }
-    /* loudspeaker direction parameters */
-    else{
-        index-=k_NumOfParameters;
-        if (!(index % 2))
-            return (hosirrlib_getLoudspeakerAzi_deg(hHS, index/2)/360.0f) + 0.5f;
-        else
-            return (hosirrlib_getLoudspeakerElev_deg(hHS, (index-1)/2)/180.0f) + 0.5f;
-    }
-}
-
-int PluginProcessor::getNumParameters()
-{
-	return k_NumOfParameters + 2*HOSIRR_MAX_NUM_OUTPUTS;
 }
 
 const String PluginProcessor::getName() const
 {
     return JucePlugin_Name;
-}
-
-const String PluginProcessor::getParameterName (int index)
-{
-    /* standard parameters */
-    if(index < k_NumOfParameters){
-        switch (index) {
-            case k_analysisOrder:   return "order";
-            case k_channelOrder:    return "channel_order";
-            case k_normType:        return "norm_type";
-            case k_numLoudspeakers: return "num_loudspeakers";
-            default: return "NULL";
-        }
-    }
-    /* loudspeaker direction parameters */
-    else{
-        index-=k_NumOfParameters;
-        if (!(index % 2))
-            return TRANS("Azim_") + String(index/2);
-        else
-            return TRANS("Elev_") + String((index-1)/2);
-    }
-}
-
-const String PluginProcessor::getParameterText(int index)
-{
-    /* standard parameters */
-    if(index < k_NumOfParameters){
-        switch (index) {
-            case k_analysisOrder: return String(hosirrlib_getAnalysisOrder(hHS));
-            case k_channelOrder:
-                switch(hosirrlib_getChOrder(hHS)){
-                    case CH_ACN:  return "ACN";
-                    case CH_FUMA: return "FuMa";
-                    default: return "NULL";
-                }
-            case k_normType:
-                switch(hosirrlib_getNormType(hHS)){
-                    case NORM_N3D:  return "N3D";
-                    case NORM_SN3D: return "SN3D";
-                    case NORM_FUMA: return "FuMa";
-                    default: return "NULL";
-                }
-                
-            case k_numLoudspeakers:  return String(hosirrlib_getNumLoudspeakers(hHS));
-        
-            default: return "NULL";
-        }
-    }
-    /* loudspeaker direction parameters */
-    else{
-        index-=k_NumOfParameters;
-        if (!(index % 2))
-            return String(hosirrlib_getLoudspeakerAzi_deg(hHS, index/2));
-        else
-            return String(hosirrlib_getLoudspeakerElev_deg(hHS, (index-1)/2));
-    }
-}
-
-const String PluginProcessor::getInputChannelName (int channelIndex) const
-{
-    return String (channelIndex + 1);
-}
-
-const String PluginProcessor::getOutputChannelName (int channelIndex) const
-{
-    return String (channelIndex + 1);
 }
 
 double PluginProcessor::getTailLengthSeconds() const
@@ -187,18 +127,6 @@ const String PluginProcessor::getProgramName (int /*index*/)
     return String();
 }
 
-
-bool PluginProcessor::isInputChannelStereoPair (int /*index*/) const
-{
-    return true;
-}
-
-bool PluginProcessor::isOutputChannelStereoPair (int /*index*/) const
-{
-    return true;
-}
-
-
 bool PluginProcessor::acceptsMidi() const
 {
    #if JucePlugin_WantsMidiInput
@@ -215,11 +143,6 @@ bool PluginProcessor::producesMidi() const
    #else
     return false;
    #endif
-}
-
-bool PluginProcessor::silenceInProducesSilenceOut() const
-{
-    return false;
 }
 
 void PluginProcessor::changeProgramName (int /*index*/, const String& /*newName*/)
@@ -251,43 +174,37 @@ bool PluginProcessor::hasEditor() const
 
 AudioProcessorEditor* PluginProcessor::createEditor()
 {
-    return new PluginEditor (this);
+    return new PluginEditor (*this);
 }
 
 //==============================================================================
 void PluginProcessor::getStateInformation (MemoryBlock& destData)
 {
-    XmlElement xml("HOSIRRPLUGINSETTINGS");
- 
-    xml.setAttribute("AnalysisOrder", hosirrlib_getAnalysisOrder(hHS));
-    for(int i=0; i<hosirrlib_getMaxNumLoudspeakers(); i++){
-        xml.setAttribute("LoudspeakerAziDeg" + String(i), hosirrlib_getLoudspeakerAzi_deg(hHS,i));
-        xml.setAttribute("LoudspeakerElevDeg" + String(i), hosirrlib_getLoudspeakerElev_deg(hHS,i));
-    }
-    xml.setAttribute("nLoudspeakers", hosirrlib_getNumLoudspeakers(hHS));
-    xml.setAttribute("Norm", hosirrlib_getNormType(hHS));
-    xml.setAttribute("ChOrder", hosirrlib_getChOrder(hHS));
+    juce::ValueTree state = parameters.copyState();
+    std::unique_ptr<juce::XmlElement> xml(state.createXml());
+    xml->setTagName("HOSIRRPLUGINSETTINGS");
+    xml->setAttribute("VersionCode", JucePlugin_VersionCode); // added since 0x10006
     
-    xml.setAttribute("JSONFilePath", lastJSONDir.getFullPathName());
-    xml.setAttribute("LoadWavFilePath", getLoadWavDirectory());
-    xml.setAttribute("SaveWavFilePath", lastSaveWavDirectory.getFullPathName());
+    /* Now for the other DSP object parameters (that have no JUCE parameter counterpart) */
     
-    //if(!ambi_dec_getUseDefaultHRIRsflag(hAmbi))
-    //    xml.setAttribute("SofaFilePath", String(ambi_dec_getSofaFilePath(hAmbi)));
-
-    copyXmlToBinary(xml, destData);
+    /* Other */
+    xml->setAttribute("JSONFilePath", lastJSONDir.getFullPathName());
+    xml->setAttribute("LoadWavFilePath", getLoadWavDirectory());
+    xml->setAttribute("SaveWavFilePath", lastSaveWavDirectory.getFullPathName());
+    
+    /* Save */
+    copyXmlToBinary(*xml, destData);
 }
 
 void PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    std::unique_ptr<XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes));
-    int i;
-
-    if (xmlState != nullptr) {
-        if (xmlState->hasTagName("HOSIRRPLUGINSETTINGS")) {
+    /* Load */
+    std::unique_ptr<juce::XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes));
+    if (xmlState != nullptr && xmlState->hasTagName("HOSIRRPLUGINSETTINGS")){
+        if(!xmlState->hasAttribute("VersionCode")){ // pre-0x10006
             if(xmlState->hasAttribute("AnalysisOrder"))
                 hosirrlib_setAnalysisOrder(hHS, xmlState->getIntAttribute("AnalysisOrder",1));
-            for(i=0; i<hosirrlib_getMaxNumLoudspeakers(); i++){
+            for(int i=0; i<hosirrlib_getMaxNumLoudspeakers(); i++){
                 if(xmlState->hasAttribute("LoudspeakerAziDeg" + String(i)))
                     hosirrlib_setLoudspeakerAzi_deg(hHS, i, (float)xmlState->getDoubleAttribute("LoudspeakerAziDeg" + String(i), 0.0f));
                 if(xmlState->hasAttribute("LoudspeakerElevDeg" + String(i)))
@@ -300,6 +217,21 @@ void PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
             if(xmlState->hasAttribute("ChOrder"))
                 hosirrlib_setChOrder(hHS, xmlState->getIntAttribute("ChOrder", 1));
             
+            if(xmlState->hasAttribute("JSONFilePath"))
+                lastJSONDir = xmlState->getStringAttribute("JSONFilePath", "");
+            if(xmlState->hasAttribute("LoadWavFilePath"))
+                setLoadWavDirectory(xmlState->getStringAttribute("LoadWavFilePath", ""));
+            if(xmlState->hasAttribute("SaveWavFilePath"))
+                setSaveWavDirectory(xmlState->getStringAttribute("SaveWavFilePath", ""));
+            
+            setParameterValuesUsingInternalState();
+        }
+        else if(xmlState->getIntAttribute("VersionCode")>=0x10006){
+            parameters.replaceState(juce::ValueTree::fromXml(*xmlState));
+            
+            /* Now for the other DSP object parameters (that have no JUCE parameter counterpart) */
+            
+            /* Other */
             if(xmlState->hasAttribute("JSONFilePath"))
                 lastJSONDir = xmlState->getStringAttribute("JSONFilePath", "");
             if(xmlState->hasAttribute("LoadWavFilePath"))

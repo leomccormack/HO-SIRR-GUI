@@ -15,6 +15,8 @@
               enableIAA="0" companyCopyright="Aalto" pluginFormats="buildStandalone,buildVST"
               pluginChannelConfigs="{0,0}" jucerFormatVersion="1">
   <MAINGROUP id="imnfnp" name="HOSIRR">
+    <FILE id="G8qYgV" name="ParameterManager.h" compile="0" resource="0"
+          file="../resources/ParameterManager.h"/>
     <FILE id="BTiPhl" name="HOSIRRLookAndFeel.h" compile="0" resource="0"
           file="../resources/HOSIRRLookAndFeel.h"/>
     <FILE id="WbSLFb" name="RIRview.cpp" compile="1" resource="0" file="src/RIRview.cpp"/>

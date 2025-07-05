@@ -22,8 +22,8 @@
 
 #include "PluginEditor.h"
 
-PluginEditor::PluginEditor (PluginProcessor* ownerFilter)
-    : AudioProcessorEditor(ownerFilter), progressbar(progress), fileChooser ("File", File(), true, false, false, "*.wav", String(),
+PluginEditor::PluginEditor (PluginProcessor& p)
+    : AudioProcessorEditor(p), processor(p), progressbar(progress), fileChooser ("File", File(), true, false, false, "*.wav", String(),
       "Load *.wav File"), thumbnailCache (5)
 {
     CBoutputDirsPreset.reset (new juce::ComboBox ("new combo box"));
@@ -37,31 +37,26 @@ PluginEditor::PluginEditor (PluginProcessor* ownerFilter)
 
     CBoutputDirsPreset->setBounds (520, 96, 112, 20);
 
-    SL_num_loudspeakers.reset (new juce::Slider ("new slider"));
+    SL_num_loudspeakers = std::make_unique<SliderWithAttachment>(p.parameters, "numLoudspeakers");
     addAndMakeVisible (SL_num_loudspeakers.get());
-    SL_num_loudspeakers->setRange (1, 64, 1);
     SL_num_loudspeakers->setSliderStyle (juce::Slider::LinearHorizontal);
     SL_num_loudspeakers->setTextBoxStyle (juce::Slider::TextBoxRight, false, 60, 20);
     SL_num_loudspeakers->addListener (this);
 
     SL_num_loudspeakers->setBounds (592, 124, 40, 20);
 
-    CBchFormat.reset (new juce::ComboBox ("new combo box"));
+    CBchFormat = std::make_unique<ComboBoxWithAttachment>(p.parameters, "channelOrder");
     addAndMakeVisible (CBchFormat.get());
     CBchFormat->setEditableText (false);
     CBchFormat->setJustificationType (juce::Justification::centredLeft);
-    CBchFormat->setTextWhenNothingSelected (TRANS("ACN"));
-    CBchFormat->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
     CBchFormat->addListener (this);
 
     CBchFormat->setBounds (77, 95, 68, 20);
 
-    CBnormScheme.reset (new juce::ComboBox ("new combo box"));
+    CBnormScheme = std::make_unique<ComboBoxWithAttachment>(p.parameters, "normType");
     addAndMakeVisible (CBnormScheme.get());
     CBnormScheme->setEditableText (false);
     CBnormScheme->setJustificationType (juce::Justification::centredLeft);
-    CBnormScheme->setTextWhenNothingSelected (TRANS("N3D"));
-    CBnormScheme->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
     CBnormScheme->addListener (this);
 
     CBnormScheme->setBounds (147, 95, 72, 20);
@@ -85,12 +80,10 @@ PluginEditor::PluginEditor (PluginProcessor* ownerFilter)
 
     tb_saveJSON->setBounds (600, 161, 34, 14);
 
-    CBanaOrder.reset (new juce::ComboBox ("new combo box"));
+    CBanaOrder = std::make_unique<ComboBoxWithAttachment>(p.parameters, "inputOrder");
     addAndMakeVisible (CBanaOrder.get());
     CBanaOrder->setEditableText (false);
     CBanaOrder->setJustificationType (juce::Justification::centredLeft);
-    CBanaOrder->setTextWhenNothingSelected (TRANS("Default"));
-    CBanaOrder->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
     CBanaOrder->addListener (this);
 
     CBanaOrder->setBounds (344, 95, 88, 20);
@@ -209,8 +202,7 @@ PluginEditor::PluginEditor (PluginProcessor* ownerFilter)
     setSize (656, 380);
 
     /* handles */
-    hVst = ownerFilter;
-    hHS = hVst->getFXHandle();
+    hHS = processor.getFXHandle();
 
     /* init OpenGL */
 #ifndef PLUGIN_EDITOR_DISABLE_OPENGL
@@ -229,22 +221,6 @@ PluginEditor::PluginEditor (PluginProcessor* ownerFilter)
     SL_windowSize->setColour(Slider::trackColourId, Colours::transparentBlack);
     SL_windowSize->setSliderStyle(Slider::SliderStyle::LinearBarVertical);
     SL_windowSize->setSliderSnapsToMousePosition(false);
-
-    /* add analysis order options */
-    CBanaOrder->addItem (TRANS("1st order"), ANALYSIS_ORDER_FIRST);
-    CBanaOrder->addItem (TRANS("2nd order"), ANALYSIS_ORDER_SECOND);
-    CBanaOrder->addItem (TRANS("3rd order"), ANALYSIS_ORDER_THIRD);
-    CBanaOrder->addItem (TRANS("4th order"), ANALYSIS_ORDER_FOURTH);
-    CBanaOrder->addItem (TRANS("5th order"), ANALYSIS_ORDER_FIFTH);
-    CBanaOrder->addItem (TRANS("6th order"), ANALYSIS_ORDER_SIXTH);
-    CBanaOrder->addItem (TRANS("7th order"), ANALYSIS_ORDER_SEVENTH);
-
-    /* ambi convention options */
-    CBchFormat->addItem (TRANS("ACN"), CH_ACN);
-    CBchFormat->addItem (TRANS("FuMa"), CH_FUMA);
-    CBnormScheme->addItem (TRANS("N3D"), NORM_N3D);
-    CBnormScheme->addItem (TRANS("SN3D"), NORM_SN3D);
-    CBnormScheme->addItem (TRANS("FuMa"), NORM_FUMA);
 
     /* add loudspeaker preset options */
     CBoutputDirsPreset->addItem (TRANS("5.x"), LOUDSPEAKER_ARRAY_PRESET_5PX);
@@ -272,7 +248,7 @@ PluginEditor::PluginEditor (PluginProcessor* ownerFilter)
     /* source coordinate viewport */
     outputCoordsVP.reset (new Viewport ("new viewport"));
     addAndMakeVisible (outputCoordsVP.get());
-    outputCoordsView_handle = new outputCoordsView(ownerFilter, MAX_NUM_CHANNELS, hosirrlib_getNumLoudspeakers(hHS));
+    outputCoordsView_handle = new outputCoordsView(p, MAX_NUM_CHANNELS, hosirrlib_getNumLoudspeakers(hHS));
     outputCoordsVP->setViewedComponent (outputCoordsView_handle);
     outputCoordsVP->setScrollBarsShown (true, false);
     outputCoordsVP->setAlwaysOnTop(true);
@@ -286,8 +262,8 @@ PluginEditor::PluginEditor (PluginProcessor* ownerFilter)
     fileChooser.setColour(TextButton::buttonColourId, Colour (0xff187252));
     formatManager.registerBasicFormats();
     durationInSeconds = 0.0f;
-    if(hVst->getLoadWavDirectory() != TRANS("no_file")){
-        fileChooser.setCurrentFile(hVst->getLoadWavDirectory(), true);
+    if(processor.getLoadWavDirectory() != TRANS("no_file")){
+        fileChooser.setCurrentFile(processor.getLoadWavDirectory(), true);
         loadWavFile();
     }
 
@@ -317,10 +293,8 @@ PluginEditor::PluginEditor (PluginProcessor* ownerFilter)
     ///CBdisplayRIR->addItem (TRANS("LS RIR"), RIR_VIEW_LS_LABELS);
 
     /* grab current parameter settings */
-    CBanaOrder->setSelectedId(hosirrlib_getAnalysisOrder(hHS), dontSendNotification);
-    SL_num_loudspeakers->setValue(hosirrlib_getNumLoudspeakers(hHS),dontSendNotification);
-    CBchFormat->setSelectedId(hosirrlib_getChOrder(hHS), dontSendNotification);
-    CBnormScheme->setSelectedId(hosirrlib_getNormType(hHS), dontSendNotification);
+    CBchFormat->setSelectedId(hosirrlib_getChOrder(hHS), sendNotification);
+    CBnormScheme->setSelectedId(hosirrlib_getNormType(hHS), sendNotification);
     CBchFormat->setItemEnabled(CH_FUMA, hosirrlib_getAnalysisOrder(hHS)==ANALYSIS_ORDER_FIRST ? true : false);
     CBnormScheme->setItemEnabled(NORM_FUMA, hosirrlib_getAnalysisOrder(hHS)==ANALYSIS_ORDER_FIRST ? true : false);
     SL_displayGain->setValue(dispGain_dB, dontSendNotification);
@@ -818,18 +792,12 @@ void PluginEditor::comboBoxChanged (juce::ComboBox* comboBoxThatHasChanged)
     if (comboBoxThatHasChanged == CBoutputDirsPreset.get())
     {
         hosirrlib_setOutputConfigPreset(hHS, CBoutputDirsPreset->getSelectedId());
-    }
-    else if (comboBoxThatHasChanged == CBchFormat.get())
-    {
-        hosirrlib_setChOrder(hHS, CBchFormat->getSelectedId());
-    }
-    else if (comboBoxThatHasChanged == CBnormScheme.get())
-    {
-        hosirrlib_setNormType(hHS, CBnormScheme->getSelectedId());
-    }
-    else if (comboBoxThatHasChanged == CBanaOrder.get())
-    {
-        hosirrlib_setAnalysisOrder(hHS, CBanaOrder->getSelectedId());
+        
+        processor.setParameterValue("numLoudspeakers", hosirrlib_getNumLoudspeakers(hHS));
+        for(int i=0; i<hosirrlib_getNumLoudspeakers(hHS); i++){
+            processor.setParameterValue("azim" + juce::String(i), hosirrlib_getLoudspeakerAzi_deg(hHS,i));
+            processor.setParameterValue("elev" + juce::String(i), hosirrlib_getLoudspeakerElev_deg(hHS,i));
+        }
     }
     else if (comboBoxThatHasChanged == CBdisplayRIR.get())
     {
@@ -847,11 +815,7 @@ void PluginEditor::comboBoxChanged (juce::ComboBox* comboBoxThatHasChanged)
 
 void PluginEditor::sliderValueChanged (juce::Slider* sliderThatWasMoved)
 {
-    if (sliderThatWasMoved == SL_num_loudspeakers.get())
-    {
-        hosirrlib_setNumLoudspeakers(hHS, (int)SL_num_loudspeakers->getValue());
-    }
-    else if (sliderThatWasMoved == SL_wetDryBalance.get())
+    if (sliderThatWasMoved == SL_wetDryBalance.get())
     {
         hosirrlib_setWetDryBalance(hHS, (float)SL_wetDryBalance->getValue());
     }
@@ -876,29 +840,29 @@ void PluginEditor::buttonClicked (juce::Button* buttonThatWasClicked)
     if (buttonThatWasClicked == tb_loadJSON.get())
     {
         chooser = std::make_unique<juce::FileChooser> ("Load configuration...",
-                                                       hVst->getLastJSONDir().exists() ? hVst->getLastJSONDir() : File::getSpecialLocation (File::userHomeDirectory),
+                                                       processor.getLastJSONDir().exists() ? processor.getLastJSONDir() : File::getSpecialLocation (File::userHomeDirectory),
                                                        "*.json");
         auto chooserFlags = juce::FileBrowserComponent::openMode
                                   | juce::FileBrowserComponent::canSelectFiles;
         chooser->launchAsync (chooserFlags, [this] (const FileChooser& fc) {
             auto file = fc.getResult();
             if (file != File{}){
-                hVst->setLastJSONDir(file.getParentDirectory());
-                hVst->loadConfiguration (file);
+                processor.setLastJSONDir(file.getParentDirectory());
+                processor.loadConfiguration (file);
             }
         });
     }
     else if (buttonThatWasClicked == tb_saveJSON.get())
     {
         chooser = std::make_unique<juce::FileChooser> ("Save configuration...",
-                                                       hVst->getLastJSONDir().exists() ? hVst->getLastJSONDir() : File::getSpecialLocation (File::userHomeDirectory),
+                                                       processor.getLastJSONDir().exists() ? processor.getLastJSONDir() : File::getSpecialLocation (File::userHomeDirectory),
                                                        "*.json");
         auto chooserFlags = juce::FileBrowserComponent::saveMode;
         chooser->launchAsync (chooserFlags, [this] (const FileChooser& fc) {
             auto file = fc.getResult();
             if (file != File{}) {
-                hVst->setLastJSONDir(file.getParentDirectory());
-                hVst->saveConfigurationToFile (file);
+                processor.setLastJSONDir(file.getParentDirectory());
+                processor.saveConfigurationToFile (file);
             }
         });
     }
@@ -918,13 +882,13 @@ void PluginEditor::buttonClicked (juce::Button* buttonThatWasClicked)
         if(hosirrlib_getLsRIRstatus(hHS)==LS_RIR_STATUS_RENDERED){
             /* ask user, where to save */
             chooser = std::make_unique<juce::FileChooser> ("Save wav...",
-                                                           hVst->getSaveWavDirectory().exists() ? hVst->getSaveWavDirectory() : File::getSpecialLocation (File::userHomeDirectory),
+                                                           processor.getSaveWavDirectory().exists() ? processor.getSaveWavDirectory() : File::getSpecialLocation (File::userHomeDirectory),
                                                            "*.wav");
             auto chooserFlags = juce::FileBrowserComponent::saveMode;
             chooser->launchAsync (chooserFlags, [this] (const FileChooser& fc) {
                 auto file = fc.getResult();
                 if (file != File{}) {
-                    hVst->setSaveWavDirectory(file.getParentDirectory());
+                    processor.setSaveWavDirectory(file.getParentDirectory());
 
                     /* fill audio buffer */
                     AudioBuffer<float> buffer;
@@ -957,16 +921,14 @@ void PluginEditor::timerCallback()
 {
     /* parameters whos values can change internally should be periodically refreshed */
     outputCoordsView_handle->setNCH(hosirrlib_getNumLoudspeakers(hHS));
-    SL_num_loudspeakers->setValue(hosirrlib_getNumLoudspeakers(hHS),dontSendNotification);
-    CBchFormat->setSelectedId(hosirrlib_getChOrder(hHS), dontSendNotification);
-    CBnormScheme->setSelectedId(hosirrlib_getNormType(hHS), dontSendNotification);
+    CBchFormat->setSelectedId(hosirrlib_getChOrder(hHS), sendNotification);
+    CBnormScheme->setSelectedId(hosirrlib_getNormType(hHS), sendNotification);
     CBchFormat->setItemEnabled(CH_FUMA, hosirrlib_getAnalysisOrder(hHS)==ANALYSIS_ORDER_FIRST ? true : false);
     CBnormScheme->setItemEnabled(NORM_FUMA, hosirrlib_getAnalysisOrder(hHS)==ANALYSIS_ORDER_FIRST ? true : false);
     label_inputOrder->setText(String(hosirrlib_getAmbiRIRinputOrder(hHS)), dontSendNotification);
     label_inputLength->setText(String(hosirrlib_getAmbiRIRlength_seconds(hHS)), dontSendNotification);
     label_inputSampleRate->setText(String(hosirrlib_getAmbiRIRsampleRate(hHS)), dontSendNotification);
     SL_windowSize->setValue(hosirrlib_getWindowLength(hHS), dontSendNotification);
-    CBanaOrder->setSelectedId(hosirrlib_getAnalysisOrder(hHS), dontSendNotification);
     for(int i=1; i<=HOSIRR_MAX_SH_ORDER; i++)
         CBanaOrder->setItemEnabled(i, i<=hosirrlib_getAmbiRIRinputOrder(hHS));
 

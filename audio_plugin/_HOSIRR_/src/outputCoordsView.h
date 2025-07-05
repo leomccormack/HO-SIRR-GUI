@@ -29,38 +29,30 @@ class outputCoordsView  : public Component,
                           public juce::Slider::Listener
 {
 public:
-    outputCoordsView (PluginProcessor* ownerFilter, int _maxNCH, int _currentNCH );
+    outputCoordsView (PluginProcessor& p, int _maxNCH, int _currentNCH );
     ~outputCoordsView() override;
     
     void setNCH(int newNCH){
 		newNCH = newNCH > MAX_NUM_CHANNELS ? MAX_NUM_CHANNELS : newNCH;
-        refreshCoords();
 		if (newNCH != currentNCH) {
 			currentNCH = newNCH;
 			resized();
-			sliderHasChanged = true;
 		}
     }
-
-    bool getHasASliderChanged(){ return sliderHasChanged; }
-    void setHasASliderChange(bool newState){ sliderHasChanged = newState; }
 
     void paint (juce::Graphics& g) override;
     void resized() override;
     void sliderValueChanged (juce::Slider* sliderThatWasMoved) override;
 
 private:
-    PluginProcessor* hVst;
+    PluginProcessor& processor;
     void* hHS;
-    void refreshCoords();
-    std::unique_ptr<Slider>* aziSliders;
-    std::unique_ptr<Slider>* elevSliders;
+    std::vector<std::unique_ptr<SliderWithAttachment>> aziSliders;
+    std::vector<std::unique_ptr<SliderWithAttachment>> elevSliders;
     int maxNCH, currentNCH;
-    bool sliderHasChanged;
+
     /* tooltips */
     SharedResourcePointer<TooltipWindow> tipWindow;
-
-    std::unique_ptr<juce::Slider> dummySlider;
-
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (outputCoordsView)
 };
