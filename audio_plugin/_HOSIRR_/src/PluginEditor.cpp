@@ -34,7 +34,6 @@ PluginEditor::PluginEditor (PluginProcessor& p)
     CBoutputDirsPreset->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
     CBoutputDirsPreset->addItem (TRANS("Default"), 1);
     CBoutputDirsPreset->addListener (this);
-
     CBoutputDirsPreset->setBounds (520, 96, 112, 20);
 
     SL_num_loudspeakers = std::make_unique<SliderWithAttachment>(p.parameters, "numLoudspeakers");
@@ -42,7 +41,6 @@ PluginEditor::PluginEditor (PluginProcessor& p)
     SL_num_loudspeakers->setSliderStyle (juce::Slider::LinearHorizontal);
     SL_num_loudspeakers->setTextBoxStyle (juce::Slider::TextBoxRight, false, 60, 20);
     SL_num_loudspeakers->addListener (this);
-
     SL_num_loudspeakers->setBounds (592, 124, 40, 20);
 
     CBchFormat = std::make_unique<ComboBoxWithAttachment>(p.parameters, "channelOrder");
@@ -50,7 +48,6 @@ PluginEditor::PluginEditor (PluginProcessor& p)
     CBchFormat->setEditableText (false);
     CBchFormat->setJustificationType (juce::Justification::centredLeft);
     CBchFormat->addListener (this);
-
     CBchFormat->setBounds (77, 95, 68, 20);
 
     CBnormScheme = std::make_unique<ComboBoxWithAttachment>(p.parameters, "normType");
@@ -58,7 +55,6 @@ PluginEditor::PluginEditor (PluginProcessor& p)
     CBnormScheme->setEditableText (false);
     CBnormScheme->setJustificationType (juce::Justification::centredLeft);
     CBnormScheme->addListener (this);
-
     CBnormScheme->setBounds (147, 95, 72, 20);
 
     tb_loadJSON.reset (new juce::TextButton ("new button"));
@@ -66,8 +62,6 @@ PluginEditor::PluginEditor (PluginProcessor& p)
     tb_loadJSON->setButtonText (TRANS("Import"));
     tb_loadJSON->setConnectedEdges (juce::Button::ConnectedOnRight);
     tb_loadJSON->addListener (this);
-    tb_loadJSON->setColour (juce::TextButton::buttonColourId, juce::Colour (0xff14889e));
-
     tb_loadJSON->setBounds (456, 161, 34, 14);
 
     tb_saveJSON.reset (new juce::TextButton ("new button"));
@@ -75,9 +69,6 @@ PluginEditor::PluginEditor (PluginProcessor& p)
     tb_saveJSON->setButtonText (TRANS("Export"));
     tb_saveJSON->setConnectedEdges (juce::Button::ConnectedOnLeft);
     tb_saveJSON->addListener (this);
-    tb_saveJSON->setColour (juce::TextButton::buttonColourId, juce::Colour (0xff224d97));
-    tb_saveJSON->setColour (juce::TextButton::buttonOnColourId, juce::Colour (0xff181f9a));
-
     tb_saveJSON->setBounds (600, 161, 34, 14);
 
     CBanaOrder = std::make_unique<ComboBoxWithAttachment>(p.parameters, "inputOrder");
@@ -85,59 +76,39 @@ PluginEditor::PluginEditor (PluginProcessor& p)
     CBanaOrder->setEditableText (false);
     CBanaOrder->setJustificationType (juce::Justification::centredLeft);
     CBanaOrder->addListener (this);
-
     CBanaOrder->setBounds (344, 95, 88, 20);
 
     tb_render.reset (new juce::TextButton ("new button"));
     addAndMakeVisible (tb_render.get());
     tb_render->setButtonText (TRANS("Render"));
     tb_render->addListener (this);
-    tb_render->setColour (juce::TextButton::buttonColourId, juce::Colour (0xff9e8c14));
-
     tb_render->setBounds (264, 65, 144, 18);
 
     tb_saveRIR.reset (new juce::TextButton ("new button"));
     addAndMakeVisible (tb_saveRIR.get());
     tb_saveRIR->setButtonText (TRANS("Save"));
     tb_saveRIR->addListener (this);
-    tb_saveRIR->setColour (juce::TextButton::buttonColourId, juce::Colour (0xff9e2f14));
-
     tb_saveRIR->setBounds (480, 65, 136, 18);
 
-    label_inputOrder.reset (new juce::Label ("new label",
-                                             juce::String()));
+    label_inputOrder.reset (new juce::Label ("new label", juce::String()));
     addAndMakeVisible (label_inputOrder.get());
     label_inputOrder->setFont (juce::FontOptions (15.00f, juce::Font::plain).withStyle ("Regular"));
     label_inputOrder->setJustificationType (juce::Justification::centredLeft);
     label_inputOrder->setEditable (false, false, false);
-    label_inputOrder->setColour (juce::Label::outlineColourId, juce::Colour (0x68a3a2a2));
-    label_inputOrder->setColour (juce::TextEditor::textColourId, juce::Colours::black);
-    label_inputOrder->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
-
     label_inputOrder->setBounds (130, 128, 88, 20);
 
-    label_inputLength.reset (new juce::Label ("new label",
-                                              juce::String()));
+    label_inputLength.reset (new juce::Label ("new label", juce::String()));
     addAndMakeVisible (label_inputLength.get());
     label_inputLength->setFont (juce::FontOptions (15.00f, juce::Font::plain).withStyle ("Regular"));
     label_inputLength->setJustificationType (juce::Justification::centredLeft);
     label_inputLength->setEditable (false, false, false);
-    label_inputLength->setColour (juce::Label::outlineColourId, juce::Colour (0x68a3a2a2));
-    label_inputLength->setColour (juce::TextEditor::textColourId, juce::Colours::black);
-    label_inputLength->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
-
     label_inputLength->setBounds (130, 152, 88, 20);
 
-    label_inputSampleRate.reset (new juce::Label ("new label",
-                                                  juce::String()));
+    label_inputSampleRate.reset (new juce::Label ("new label", juce::String()));
     addAndMakeVisible (label_inputSampleRate.get());
     label_inputSampleRate->setFont (juce::FontOptions (15.00f, juce::Font::plain).withStyle ("Regular"));
     label_inputSampleRate->setJustificationType (juce::Justification::centredLeft);
     label_inputSampleRate->setEditable (false, false, false);
-    label_inputSampleRate->setColour (juce::Label::outlineColourId, juce::Colour (0x68a3a2a2));
-    label_inputSampleRate->setColour (juce::TextEditor::textColourId, juce::Colours::black);
-    label_inputSampleRate->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
-
     label_inputSampleRate->setBounds (130, 176, 88, 20);
 
     SL_wetDryBalance.reset (new juce::Slider ("new slider"));
@@ -145,10 +116,7 @@ PluginEditor::PluginEditor (PluginProcessor& p)
     SL_wetDryBalance->setRange (0, 2, 0.01);
     SL_wetDryBalance->setSliderStyle (juce::Slider::LinearHorizontal);
     SL_wetDryBalance->setTextBoxStyle (juce::Slider::TextBoxRight, false, 50, 20);
-    SL_wetDryBalance->setColour (juce::Slider::backgroundColourId, juce::Colour (0xff5c5d5e));
-    SL_wetDryBalance->setColour (juce::Slider::trackColourId, juce::Colour (0xff315b6d));
     SL_wetDryBalance->addListener (this);
-
     SL_wetDryBalance->setBounds (312, 151, 120, 20);
 
     SL_windowSize.reset (new juce::Slider ("new slider"));
@@ -157,7 +125,6 @@ PluginEditor::PluginEditor (PluginProcessor& p)
     SL_windowSize->setSliderStyle (juce::Slider::LinearHorizontal);
     SL_windowSize->setTextBoxStyle (juce::Slider::TextBoxRight, false, 60, 20);
     SL_windowSize->addListener (this);
-
     SL_windowSize->setBounds (360, 122, 71, 20);
 
     CBdisplayRIR.reset (new juce::ComboBox ("new combo box"));
@@ -167,7 +134,6 @@ PluginEditor::PluginEditor (PluginProcessor& p)
     CBdisplayRIR->setTextWhenNothingSelected (TRANS("Ambi RIR"));
     CBdisplayRIR->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
     CBdisplayRIR->addListener (this);
-
     CBdisplayRIR->setBounds (21, 229, 99, 18);
 
     SL_displayGain.reset (new juce::Slider ("new slider"));
@@ -175,10 +141,7 @@ PluginEditor::PluginEditor (PluginProcessor& p)
     SL_displayGain->setRange (-24, 24, 0.01);
     SL_displayGain->setSliderStyle (juce::Slider::LinearHorizontal);
     SL_displayGain->setTextBoxStyle (juce::Slider::NoTextBox, false, 50, 20);
-    SL_displayGain->setColour (juce::Slider::backgroundColourId, juce::Colour (0xff5c5d5e));
-    SL_displayGain->setColour (juce::Slider::trackColourId, juce::Colour (0xff315b6d));
     SL_displayGain->addListener (this);
-
     SL_displayGain->setBounds (344, 229, 88, 20);
 
     SL_displayTimeTrim.reset (new juce::Slider ("new slider"));
@@ -186,17 +149,13 @@ PluginEditor::PluginEditor (PluginProcessor& p)
     SL_displayTimeTrim->setRange (0.01, 1, 0.01);
     SL_displayTimeTrim->setSliderStyle (juce::Slider::LinearHorizontal);
     SL_displayTimeTrim->setTextBoxStyle (juce::Slider::NoTextBox, false, 50, 20);
-    SL_displayTimeTrim->setColour (juce::Slider::backgroundColourId, juce::Colour (0xff5c5d5e));
-    SL_displayTimeTrim->setColour (juce::Slider::trackColourId, juce::Colour (0xff315b6d));
     SL_displayTimeTrim->addListener (this);
-
     SL_displayTimeTrim->setBounds (208, 229, 88, 20);
 
     tb_BroadBand1stPeak.reset (new juce::ToggleButton ("new toggle button"));
     addAndMakeVisible (tb_BroadBand1stPeak.get());
     tb_BroadBand1stPeak->setButtonText (juce::String());
     tb_BroadBand1stPeak->addListener (this);
-
     tb_BroadBand1stPeak->setBounds (410, 174, 26, 24);
 
     setSize (656, 380);
@@ -211,7 +170,6 @@ PluginEditor::PluginEditor (PluginProcessor& p)
 #endif
 
     /* Look and Feel */
-    LAF.setDefaultColours();
     setLookAndFeel(&LAF);
 
     /* remove slider bit of these sliders */

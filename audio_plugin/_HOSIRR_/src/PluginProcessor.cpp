@@ -35,8 +35,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginProcessor::createParam
     params.push_back(std::make_unique<juce::AudioParameterInt>("numLoudspeakers", "NumLoudspeakers", 4, HOSIRR_MAX_NUM_OUTPUTS, 1,
                                                                AudioParameterIntAttributes().withAutomatable(false)));
     for(int i=0; i<HOSIRR_MAX_NUM_OUTPUTS; i++){
-        params.push_back(std::make_unique<juce::AudioParameterFloat>("azim" + juce::String(i), "Azim_" + juce::String(i+1), juce::NormalisableRange<float>(-180.0f, 180.0f, 0.01f), 0.0f, AudioParameterFloatAttributes().withAutomatable(false)));
-        params.push_back(std::make_unique<juce::AudioParameterFloat>("elev" + juce::String(i), "Elev_" + juce::String(i+1), juce::NormalisableRange<float>(-90.0f, 90.0f, 0.01f), 0.0f, AudioParameterFloatAttributes().withAutomatable(false)));
+        params.push_back(std::make_unique<juce::AudioParameterFloat>("azim" + juce::String(i), "Azim_" + juce::String(i+1), juce::NormalisableRange<float>(-180.0f, 180.0f, 0.01f), 0.0f, AudioParameterFloatAttributes().withAutomatable(false).withLabel(juce::String::fromUTF8(u8"°"))));
+        params.push_back(std::make_unique<juce::AudioParameterFloat>("elev" + juce::String(i), "Elev_" + juce::String(i+1), juce::NormalisableRange<float>(-90.0f, 90.0f, 0.01f), 0.0f, AudioParameterFloatAttributes().withAutomatable(false).withLabel(juce::String::fromUTF8(u8"°"))));
     }
     
     
@@ -78,6 +78,18 @@ void PluginProcessor::setParameterValuesUsingInternalState()
     for(int i=0; i<HOSIRR_MAX_NUM_OUTPUTS; i++){
         setParameterValue("azim" + juce::String(i), hosirrlib_getLoudspeakerAzi_deg(hHS, i));
         setParameterValue("elev" + juce::String(i), hosirrlib_getLoudspeakerElev_deg(hHS, i));
+    }
+}
+
+void PluginProcessor::setInternalStateUsingParameterValues()
+{
+    hosirrlib_setAnalysisOrder(hHS, getParameterChoice("inputOrder")+1);
+    hosirrlib_setChOrder(hHS, getParameterChoice("channelOrder")+1);
+    hosirrlib_setNormType(hHS, getParameterChoice("normType")+1);
+    hosirrlib_setNumLoudspeakers(hHS, getParameterInt("numLoudspeakers"));
+    for(int i=0; i<HOSIRR_MAX_NUM_OUTPUTS; i++){
+        hosirrlib_setLoudspeakerAzi_deg(hHS, i, getParameterFloat("azim" + juce::String(i)));
+        hosirrlib_setLoudspeakerElev_deg(hHS, i, getParameterFloat("elev" + juce::String(i)));
     }
 }
 
@@ -238,6 +250,10 @@ void PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
                 setLoadWavDirectory(xmlState->getStringAttribute("LoadWavFilePath", ""));
             if(xmlState->hasAttribute("SaveWavFilePath"))
                 setSaveWavDirectory(xmlState->getStringAttribute("SaveWavFilePath", ""));
+            
+            /* Many hosts will also trigger parameterChanged() for all parameters after calling setStateInformation() */
+            /* However, some hosts do not. Therefore, it is better to ensure that the internal state is always up-to-date by calling: */
+            setInternalStateUsingParameterValues();
         }
     }
 }
@@ -307,14 +323,23 @@ void PluginProcessor::loadConfiguration (const File& configFile)
                 if( channelIDs[j] > virtual_channelIDs[i]-i )
                     channelIDs[j]--;
         
+        /* Making sure that the internal coordinates above the current numLoudspeakers (i.e. numLoudspeakers+1:maxNumLoudspeakers) are up to date in "parameters" too */
+        /* This is because JUCE won't invoke parameterChanged() if the values are the same in the parameter list */
+        for(int i=hosirrlib_getNumLoudspeakers(hHS); i<num_ls; i++){
+            setParameterValue("azim" + juce::String(i), hosirrlib_getLoudspeakerAzi_deg(hHS, i));
+            setParameterValue("elev" + juce::String(i), hosirrlib_getLoudspeakerElev_deg(hHS, i));
+        }
+        
         /* update with the new configuration  */
-        hosirrlib_setNumLoudspeakers(hHS, num_ls);
+        setParameterValue("numLoudspeakers", num_ls);
         for (ValueTree::Iterator it = loudspeakers.begin() ; it != loudspeakers.end(); ++it){
             if ( !((*it).getProperty("Imaginary"))){
-                hosirrlib_setLoudspeakerAzi_deg(hHS, channelIDs[ls_idx]-1, (*it).getProperty("Azimuth"));
-                hosirrlib_setLoudspeakerElev_deg(hHS, channelIDs[ls_idx]-1, (*it).getProperty("Elevation"));
+                float azimValue = (float)(*it).getProperty("Azimuth");
+                float elevValue = (float)(*it).getProperty("Elevation");
+                setParameterValue("azim" + juce::String(channelIDs[ls_idx]-1), azimValue);
+                setParameterValue("elev" + juce::String(channelIDs[ls_idx]-1), elevValue);
                 ls_idx++;
             }
         }
-    } 
+    }
 }
