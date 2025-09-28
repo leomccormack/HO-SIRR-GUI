@@ -78,6 +78,21 @@ extern "C" {
 #define MAX_DIFF_FREQ_HZ ( 3000 )
 #define ALPHA_DIFF_COEFF ( 0.5f )
 
+#if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L) && !defined(__STDC_NO_ATOMICS__)
+  typedef _Atomic ANALYSIS_ORDERS _Atomic_ANALYSIS_ORDERS;
+  typedef _Atomic LOUDSPEAKER_ARRAY_PRESETS _Atomic_LOUDSPEAKER_ARRAY_PRESETS;
+  typedef _Atomic CH_ORDER _Atomic_CH_ORDER;
+  typedef _Atomic NORM_TYPES _Atomic_NORM_TYPES;
+  typedef _Atomic AMBI_RIR_STATUS _Atomic_AMBI_RIR_STATUS;
+  typedef _Atomic LS_RIR_STATUS _Atomic_LS_RIR_STATUS;
+#else
+  typedef ANALYSIS_ORDERS _Atomic_ANALYSIS_ORDERS;
+  typedef LOUDSPEAKER_ARRAY_PRESETS _Atomic_LOUDSPEAKER_ARRAY_PRESETS;
+  typedef CH_ORDER _Atomic_CH_ORDER;
+  typedef NORM_TYPES _Atomic_NORM_TYPES;
+  typedef AMBI_RIR_STATUS _Atomic_AMBI_RIR_STATUS;
+  typedef LS_RIR_STATUS _Atomic_LS_RIR_STATUS;
+#endif
 
 /* ========================================================================== */
 /*                                 Structures                                 */
@@ -88,8 +103,8 @@ extern "C" {
  */
 typedef struct _hosirrlib
 {
-    AMBI_RIR_STATUS ambiRIR_status;
-    LS_RIR_STATUS lsRIR_status;
+    _Atomic_AMBI_RIR_STATUS ambiRIR_status;
+    _Atomic_LS_RIR_STATUS lsRIR_status;
     float* shir;
     float* lsir;
     
@@ -98,18 +113,18 @@ typedef struct _hosirrlib
     int ambiRIRlength_samples;
     float ambiRIRlength_seconds;
     int ambiRIRsampleRate; 
-    float progress0_1;
+    _Atomic_FLOAT32 progress0_1;
     char* progressText;
     
     /* user parameters */
-    int analysisOrder;
-    int nLoudpkrs;         /* number of loudspeakers/virtual loudspeakers */
-    int windowLength;
-    float wetDryBalance;
-    int broadBandFirstPeakFLAG;
-    float loudpkrs_dirs_deg[MAX_NUM_LOUDSPEAKERS][2];
-    CH_ORDER chOrdering;   /* only ACN is supported */
-    NORM_TYPES norm;       /* N3D or SN3D */
+    _Atomic_INT32 analysisOrder;
+    _Atomic_INT32 nLoudpkrs;         /* number of loudspeakers/virtual loudspeakers */
+    _Atomic_INT32 windowLength;
+    _Atomic_FLOAT32 wetDryBalance;
+    _Atomic_INT32 broadBandFirstPeakFLAG;
+    _Atomic_FLOAT32 loudpkrs_dirs_deg[MAX_NUM_LOUDSPEAKERS][2];
+    _Atomic_CH_ORDER chOrdering;   /* only ACN is supported */
+    _Atomic_NORM_TYPES norm;       /* N3D or SN3D */
 
 } hosirrlib_data;
 
@@ -129,8 +144,8 @@ typedef struct _hosirrlib
  * @param[out] nDims    (&) number of dimensions (2 or 3)
  */
 void loadLoudspeakerArrayPreset(LOUDSPEAKER_ARRAY_PRESETS preset,
-                                float dirs_deg[MAX_NUM_LOUDSPEAKERS_IN_PRESET][2],
-                                int* nCH);
+                                _Atomic_FLOAT32 dirs_deg[MAX_NUM_LOUDSPEAKERS_IN_PRESET][2],
+                                _Atomic_INT32* nCH);
     
     
 #ifdef __cplusplus

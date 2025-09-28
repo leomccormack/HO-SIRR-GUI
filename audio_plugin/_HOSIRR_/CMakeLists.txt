@@ -1,7 +1,7 @@
 
 cmake_minimum_required(VERSION 3.15)
 
-project(HOSIRR VERSION 1.0.6) 
+project(HOSIRR VERSION 1.0.7) 
 
 # juce helper function to create a library, which is configured as a JUCE plugin
 juce_add_plugin(${PROJECT_NAME}

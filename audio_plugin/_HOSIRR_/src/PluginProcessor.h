@@ -26,6 +26,8 @@
 #include <JuceHeader.h>
 #include "../../resources/ParameterManager.h"
 #include "hosirrlib.h"
+#include <atomic>
+
 #define CONFIGURATIONHELPER_ENABLE_LOUDSPEAKERLAYOUT_METHODS 1
 #define CONFIGURATIONHELPER_ENABLE_GENERICLAYOUT_METHODS 1
 #include "../../resources/ConfigurationHelper.h"
@@ -67,11 +69,11 @@ public:
     File getSaveWavDirectory(){ return lastSaveWavDirectory; }
     
 private:
-    void* hHS;            /* hosirrlib handle */
-    int nNumInputs;       /* current number of input channels */
-    int nNumOutputs;      /* current number of output channels */
-    int nSampleRate;      /* current host sample rate */
-    int nHostBlockSize;   /* typical host block size to expect, in samples */
+    void* hHS;                         /* hosirrlib handle */
+    std::atomic<int> nNumInputs;       /* current number of input channels */
+    std::atomic<int> nNumOutputs;      /* current number of output channels */
+    int nSampleRate;                   /* current host sample rate */
+    std::atomic<int> nHostBlockSize;   /* typical host block size to expect, in samples */
     File lastJSONDir;
     ValueTree loudspeakers {"Loudspeakers"};
     String lastLoadWavDirectory;
