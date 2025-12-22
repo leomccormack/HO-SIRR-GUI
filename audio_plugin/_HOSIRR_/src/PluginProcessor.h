@@ -36,7 +36,8 @@
 
 class PluginProcessor  : public AudioProcessor,
                          public VST2ClientExtensions,
-                         public ParameterManager
+                         public ParameterManager,
+                         public juce::AudioProcessorValueTreeState::Listener
 {
 public:
     /* Get functions */
@@ -69,6 +70,7 @@ public:
     File getSaveWavDirectory(){ return lastSaveWavDirectory; }
     
 private:
+    bool firstInit = true;
     void* hHS;                         /* hosirrlib handle */
     std::atomic<int> nNumInputs;       /* current number of input channels */
     std::atomic<int> nNumOutputs;      /* current number of output channels */

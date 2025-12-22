@@ -98,20 +98,19 @@ void PluginProcessor::setInternalStateUsingParameterValues()
 }
 
 PluginProcessor::PluginProcessor() :
-	AudioProcessor(BusesProperties()
-		.withInput("Input", AudioChannelSet::discreteChannels(MAX_NUM_CHANNELS), true)
-	    .withOutput("Output", AudioChannelSet::discreteChannels(MAX_NUM_CHANNELS), true)),
+    AudioProcessor(BusesProperties()
+        .withInput("Input", AudioChannelSet::discreteChannels(MAX_NUM_CHANNELS), true)
+        .withOutput("Output", AudioChannelSet::discreteChannels(MAX_NUM_CHANNELS), true)),
     ParameterManager(*this, createParameterLayout())
 {
-	hosirrlib_create(&hHS);
-    
-    /* Grab defaults */
-    setParameterValuesUsingInternalState();
+    hosirrlib_create(&hHS);
+    addParameterListeners(this);
 }
 
 PluginProcessor::~PluginProcessor()
 {
-	hosirrlib_destroy(&hHS);
+    removeParameterListeners(this);
+    hosirrlib_destroy(&hHS);
 }
 
 void PluginProcessor::setCurrentProgram (int /*index*/)
@@ -167,6 +166,11 @@ void PluginProcessor::changeProgramName (int /*index*/, const String& /*newName*
 
 void PluginProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
+    if(firstInit){
+        /* Need to grab defaults */
+        setParameterValuesUsingInternalState();
+        firstInit = false;
+    }
     nHostBlockSize = samplesPerBlock;
     nNumInputs =  getTotalNumInputChannels();
     nNumOutputs = getTotalNumOutputChannels();
