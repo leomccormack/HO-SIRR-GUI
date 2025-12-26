@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="lfkRjX" name="HOSIRR" projectType="audioplug" version="1.0.7"
+<JUCERPROJECT id="lfkRjX" name="HOSIRR" projectType="audioplug" version="1.0.8"
               bundleIdentifier="com.AALTO.SPARTA" includeBinaryInAppConfig="1"
               buildVST="1" buildAU="0" pluginName="HOSIRR" pluginDesc="HOSIRR"
               pluginManufacturer="AALTO" pluginManufacturerCode="LEOM" pluginCode="SIRR"
@@ -18,6 +18,8 @@
   <MAINGROUP id="imnfnp" name="HOSIRR">
     <FILE id="G8qYgV" name="ParameterManager.h" compile="0" resource="0"
           file="../resources/ParameterManager.h"/>
+    <FILE id="MiBedm" name="PluginProcessorBase.h" compile="0" resource="0"
+          file="../resources/PluginProcessorBase.h"/>
     <FILE id="BTiPhl" name="HOSIRRLookAndFeel.h" compile="0" resource="0"
           file="../resources/HOSIRRLookAndFeel.h"/>
     <FILE id="WbSLFb" name="RIRview.cpp" compile="1" resource="0" file="src/RIRview.cpp"/>
@@ -298,12 +300,10 @@
                vst3Folder="../../../../SDKs/VST3_SDK/" extraCompilerFlags="-pedantic&#10;-W &#10;-Wall &#10;-Wextra&#10;-Wno-strict-prototypes"
                extraDefs="SAF_USE_APPLE_ACCELERATE_LP64" xcodeValidArchs="arm64,x86_64">
       <CONFIGURATIONS>
-        <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="HOSIRRd"
-                       binaryPath="" headerPath="../../../../../SDKs/Spatial_Audio_Framework/framework/include&#10;../../../../../libs/hosirrlib/include&#10;../../../../../SDKs/VST2_SDK&#10;&#10;"
+        <CONFIGURATION name="Debug" isDebug="1" optimisation="1" binaryPath="" headerPath="../../../../../SDKs/Spatial_Audio_Framework/framework/include&#10;../../../../../libs/hosirrlib/include&#10;../../../../../SDKs/VST2_SDK&#10;&#10;"
                        osxArchitecture="64BitIntel" osxCompatibility="11.0 SDK" enablePluginBinaryCopyStep="1"
                        macOSDeploymentTarget="11.0"/>
-        <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="HOSIRR"
-                       binaryPath="" headerPath="../../../../../SDKs/Spatial_Audio_Framework/framework/include&#10;../../../../../libs/hosirrlib/include&#10;../../../../../SDKs/VST2_SDK&#10;"
+        <CONFIGURATION name="Release" isDebug="0" optimisation="3" binaryPath="" headerPath="../../../../../SDKs/Spatial_Audio_Framework/framework/include&#10;../../../../../libs/hosirrlib/include&#10;../../../../../SDKs/VST2_SDK&#10;"
                        osxArchitecture="64BitIntel" osxCompatibility="11.0 SDK" enablePluginBinaryCopyStep="1"
                        linkTimeOptimisation="1" macOSDeploymentTarget="11.0"/>
       </CONFIGURATIONS>
@@ -328,10 +328,9 @@
     <LINUX_MAKE targetFolder="make/LinuxMakefile" extraLinkerFlags="-L/usr/local/lib -lsaf_mkl_custom_lp64 -lsaf_ipp_custom&#10;-Wl,-rpath,/usr/local/lib"
                 extraCompilerFlags="-pedantic" extraDefs="SAF_USE_INTEL_MKL_LP64&#10;SAF_USE_INTEL_IPP">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug" targetName="HOSIRRd" linkTimeOptimisation="1"
-                       headerPath="../../../../SDKs/Spatial_Audio_Framework/framework/include&#10;../../../../libs/hosirrlib/include&#10;../../../../SDKs/VST2_SDK&#10;/opt/intel/oneapi/mkl/latest/include&#10;/opt/intel/oneapi/ipp/latest/include&#10;"/>
+        <CONFIGURATION isDebug="1" name="Debug" linkTimeOptimisation="1" headerPath="../../../../SDKs/Spatial_Audio_Framework/framework/include&#10;../../../../libs/hosirrlib/include&#10;../../../../SDKs/VST2_SDK&#10;/opt/intel/oneapi/mkl/latest/include&#10;/opt/intel/oneapi/ipp/latest/include&#10;"/>
         <CONFIGURATION isDebug="0" name="Release" headerPath="../../../../SDKs/Spatial_Audio_Framework/framework/include&#10;../../../../libs/hosirrlib/include&#10;../../../../SDKs/VST2_SDK&#10;/opt/intel/oneapi/mkl/latest/include&#10;/opt/intel/oneapi/ipp/latest/include&#10;"
-                       linkTimeOptimisation="1" targetName="HOSIRR"/>
+                       linkTimeOptimisation="1"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_opengl" path="../../SDKs/JUCE/modules"/>
@@ -354,8 +353,8 @@
     <LINUX_MAKE targetFolder="make/LinuxMakefileRaspberryPI" extraDefs="SAF_USE_OPEN_BLAS_AND_LAPACKE&#10;"
                 extraLinkerFlags="-L/usr/lib/arm-linux-gnueabihf -lopenblas  -llapacke">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug" targetName="HOSIRRd" headerPath="../../../../SDKs/Spatial_Audio_Framework/framework/include&#10;../../../../libs/hosirrlib/include&#10;../../../../SDKs/VST2_SDK&#10;/usr/include&#10;/usr/include/arm-linux-gnueabihf&#10;"/>
-        <CONFIGURATION isDebug="0" name="Release" targetName="HOSIRR" headerPath="../../../../SDKs/Spatial_Audio_Framework/framework/include&#10;../../../../libs/hosirrlib/include&#10;../../../../SDKs/VST2_SDK&#10;/usr/include&#10;/usr/include/arm-linux-gnueabihf&#10;"/>
+        <CONFIGURATION isDebug="1" name="Debug" headerPath="../../../../SDKs/Spatial_Audio_Framework/framework/include&#10;../../../../libs/hosirrlib/include&#10;../../../../SDKs/VST2_SDK&#10;/usr/include&#10;/usr/include/arm-linux-gnueabihf&#10;"/>
+        <CONFIGURATION isDebug="0" name="Release" headerPath="../../../../SDKs/Spatial_Audio_Framework/framework/include&#10;../../../../libs/hosirrlib/include&#10;../../../../SDKs/VST2_SDK&#10;/usr/include&#10;/usr/include/arm-linux-gnueabihf&#10;"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_opengl" path="../../SDKs/JUCE/modules"/>
