@@ -329,22 +329,7 @@ void PluginEditor::paint (juce::Graphics& g)
 {
     using namespace ColoursUI;
 
-    /* Background gradients */
-    drawVerticalGradient(g, {0,  30, 656,163}, bgDark1, bgDark2);
-    drawVerticalGradient(g, {0, 192, 656,188}, bgDark2, bgDark1);
-
-    /* Top rounded bar */
-    {
-        juce::Rectangle<float> r {1.f, 1.f, 654.f, 32.f};
-        g.setGradientFill(juce::ColourGradient(bgDark2,
-                                               r.getX(), r.getBottom(),
-                                               bgDark1,
-                                               r.getRight(), r.getY(),
-                                               false));
-        g.fillRoundedRectangle(r, 5.f);
-        g.setColour(borderGrey);
-        g.drawRoundedRectangle(r, 5.f, 2.f);
-    }
+    drawPluginBackgroundAndBanner(g, getBounds());
 
     /* Panels */
     drawPanel(g, {12, 58,213,32}, panelFill,      panelStroke);
@@ -359,13 +344,6 @@ void PluginEditor::paint (juce::Graphics& g)
     drawPanel(g, {446, 90,196,64}, panelFill,      panelStroke);
     drawPanel(g, {446,153,196,215}, panelFill,     panelStroke);
     drawPanel(g, {12,224,428,144}, panelFill, panelStroke);
-
-    /* Borders */
-    g.setColour(borderGrey);
-    g.drawRect({0,   0, 656, 2}, 2);
-    g.drawRect({0,   0,   2,380}, 2);
-    g.drawRect({654, 0,   2,380}, 2);
-    g.drawRect({0, 378, 656, 2}, 2);
 
     /* Title */
     drawLabel(g, {16,1,480,32}, "Higher-Order Spatial Impulse Response Renderer", 18.8f);
