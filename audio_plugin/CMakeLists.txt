@@ -29,4 +29,8 @@ if (BUILD_PLUGIN_FORMAT_STANDALONE)
     message("--  Building Standalone versions")
 endif()
 
+juce_add_binary_data (GUI_fonts SOURCES
+    resources/Fonts/Inter-Bold.ttf
+    resources/Fonts/Inter-Regular.ttf)
+
 add_subdirectory(_HOSIRR_) 

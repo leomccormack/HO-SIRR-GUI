@@ -16,6 +16,12 @@
               pluginAAXCategory="512" defines="JucePlugin_AAXDisableDefaultSettingsChunks=1&#10;"
               pluginCharacteristicsValue="pluginAAXDisableMultiMono">
   <MAINGROUP id="imnfnp" name="HOSIRR">
+    <GROUP id="{2935DAD9-5D78-69FC-7EDF-0E397EB81563}" name="Fonts">
+      <FILE id="Ud3QEm" name="Inter-Bold.ttf" compile="0" resource="1" file="../resources/Fonts/Inter-Bold.ttf"/>
+      <FILE id="GO6G4W" name="Inter-Regular.ttf" compile="0" resource="1"
+            file="../resources/Fonts/Inter-Regular.ttf"/>
+      <FILE id="VQ5hSN" name="LICENSE.txt" compile="0" resource="1" file="../resources/Fonts/LICENSE.txt"/>
+    </GROUP>
     <FILE id="G8qYgV" name="ParameterManager.h" compile="0" resource="0"
           file="../resources/ParameterManager.h"/>
     <FILE id="MiBedm" name="PluginProcessorBase.h" compile="0" resource="0"
@@ -301,11 +307,11 @@
                extraDefs="SAF_USE_APPLE_ACCELERATE_LP64" xcodeValidArchs="arm64,x86_64">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" binaryPath="" headerPath="../../../../../SDKs/Spatial_Audio_Framework/framework/include&#10;../../../../../libs/hosirrlib/include&#10;../../../../../SDKs/VST2_SDK&#10;&#10;"
-                       osxArchitecture="64BitIntel" osxCompatibility="11.0 SDK" enablePluginBinaryCopyStep="1"
-                       macOSDeploymentTarget="11.0"/>
+                       osxArchitecture="64BitIntel" osxCompatibility="12.0 SDK" enablePluginBinaryCopyStep="1"
+                       macOSDeploymentTarget="12.0"/>
         <CONFIGURATION name="Release" isDebug="0" optimisation="3" binaryPath="" headerPath="../../../../../SDKs/Spatial_Audio_Framework/framework/include&#10;../../../../../libs/hosirrlib/include&#10;../../../../../SDKs/VST2_SDK&#10;"
-                       osxArchitecture="64BitIntel" osxCompatibility="11.0 SDK" enablePluginBinaryCopyStep="1"
-                       linkTimeOptimisation="1" macOSDeploymentTarget="11.0"/>
+                       osxArchitecture="64BitIntel" osxCompatibility="12.0 SDK" enablePluginBinaryCopyStep="1"
+                       linkTimeOptimisation="1" macOSDeploymentTarget="12.0"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_opengl" path="../../SDKs/JUCE/modules"/>

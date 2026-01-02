@@ -367,10 +367,10 @@ void PluginEditor::paint (juce::Graphics& g)
 
     /* Right column labels */
     drawLabel(g, {455, 90,67,30},  "Presets:",        15.f);
-    drawLabel(g, {455,118,169,30}, "N Loudspeakers",  14.5f);
+    drawLabel(g, {455,118,169,30}, "Num Loudspeakers:",  15.f);
 
     /* Azimuth/Elevation header */
-    drawLabel(g, {499,154,105,28},
+    drawLabel(g, {501,154,105,28},
               juce::CharPointer_UTF8("Azi\xc2\xb0   #   Elev\xc2\xb0"),
               15.f);
 
